@@ -14,6 +14,9 @@ class OAuthProvider(BaseModel):
     scopes = db.Column(db.JSON, default=list)
     is_active = db.Column(db.Boolean, default=True)
     
+    # ADD RELATIONSHIPS
+    user_accounts = db.relationship('UserOAuthAccount', back_populates='provider')
+    
     def __repr__(self):
         return f'<OAuthProvider {self.provider_name}>'
 
@@ -28,6 +31,10 @@ class UserOAuthAccount(BaseModel):
     refresh_token_encrypted = db.Column(db.Text)
     token_expires_at = db.Column(db.DateTime)
     provider_data = db.Column(db.JSON, default=dict)
+    
+    # ADD RELATIONSHIPS
+    user = db.relationship('User', back_populates='oauth_accounts')
+    provider = db.relationship('OAuthProvider', back_populates='user_accounts')
     
     # Unique constraint
     __table_args__ = (

@@ -10,6 +10,10 @@ class Sport(BaseModel):
     description = db.Column(db.Text)
     is_active = db.Column(db.Boolean, default=True)
     
+    # ADD RELATIONSHIPS
+    positions = db.relationship('Position', back_populates='sport', cascade='all, delete-orphan')
+    athletes = db.relationship('AthleteProfile', back_populates='primary_sport')
+    
     def __repr__(self):
         return f'<Sport {self.name}>'
 
@@ -21,6 +25,9 @@ class Position(BaseModel):
     name = db.Column(db.String(100), nullable=False)
     code = db.Column(db.String(10), nullable=False)  # PG, SG, SF, PF, C for basketball
     description = db.Column(db.Text)
+    
+    # ADD RELATIONSHIPS
+    sport = db.relationship('Sport', back_populates='positions')
     
     # Unique constraint per sport
     __table_args__ = (

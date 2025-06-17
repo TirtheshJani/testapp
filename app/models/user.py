@@ -25,6 +25,20 @@ class User(UserMixin, BaseModel):
     last_login = db.Column(db.DateTime)
     login_count = db.Column(db.Integer, default=0)
     
+    # FIXED RELATIONSHIPS with explicit foreign_keys
+    # roles = db.relationship(
+    #     'Role',
+    #     secondary='user_roles',
+    #     primaryjoin='User.user_id == UserRole.user_id',
+    #     secondaryjoin='Role.role_id == UserRole.role_id',
+    #     back_populates='users'
+    # )
+    # In the User class, replace the complex relationship with:
+    roles = db.relationship('Role', secondary='user_roles', back_populates='users')
+    
+    oauth_accounts = db.relationship('UserOAuthAccount', back_populates='user', cascade='all, delete-orphan')
+    athlete_profile = db.relationship('AthleteProfile', back_populates='user', uselist=False)
+    
     # Indexes
     __table_args__ = (
         db.Index('idx_users_email_status', 'email', 'status'),
@@ -47,13 +61,7 @@ class User(UserMixin, BaseModel):
     
     def has_role(self, role_name):
         """Check if user has a specific role."""
-        from app.models.role import Role, UserRole
-        return db.session.query(
-            db.session.query(UserRole).join(Role).filter(
-                UserRole.user_id == self.user_id,
-                Role.name == role_name
-            ).exists()
-        ).scalar()
+        return any(role.name == role_name for role in self.roles)
     
     def is_active(self):
         """Check if user account is active."""
