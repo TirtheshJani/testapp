@@ -8,9 +8,25 @@ from . import bp  # Fixed: import from current module
 @bp.route('/login', methods=['GET', 'POST'])
 def login():
     """Simple username/email and password login."""
+
     if current_user.is_authenticated:
         return redirect(url_for('main.dashboard'))
 
+    form = LoginForm()
+    if form.validate_on_submit():
+        identifier = form.username_or_email.data
+        user = (
+            User.query.filter(
+                (User.username == identifier) | (User.email == identifier)
+            ).first()
+        )
+        if user and user.check_password(form.password.data):
+            login_user(user)
+            flash('Logged in successfully.', 'success')
+            return redirect(url_for('main.dashboard'))
+        flash('Invalid username/email or password.', 'danger')
+
+    return render_template('auth/login.html', form=form)
 
 @bp.route('/logout')
 def logout():
