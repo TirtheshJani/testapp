@@ -13,3 +13,7 @@ Query parameters:
 - `min_weight` / `max_weight` – filter by weight in kilograms
 
 The endpoint returns a JSON object containing the matched athletes ordered by overall rating.
+
+## Logs
+
+Application logs are written to `logs/app.log` inside the project directory.
