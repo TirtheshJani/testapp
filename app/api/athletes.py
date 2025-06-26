@@ -1,4 +1,5 @@
 from flask import request, jsonify, current_app
+from app.utils.validators import validate_params
 from datetime import date
 from functools import lru_cache
 from sqlalchemy import or_
@@ -90,6 +91,7 @@ class AthleteSearch(Resource):
         'min_weight': 'Minimum weight (kg)',
         'max_weight': 'Maximum weight (kg)',
     }, description="Search athletes with optional filters")
+    @validate_params([])
     def get(self):
         args = request.args.to_dict(flat=True)
         key = _cache_key(args)
