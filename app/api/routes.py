@@ -1,4 +1,5 @@
 from flask import request, send_file, abort, jsonify
+from app.utils.validators import validate_json, validate_params
 from flask_restx import Resource
 import logging
 
@@ -33,6 +34,7 @@ class AthleteList(Resource):
         return jsonify({'items': data, 'total': pagination.total})
 
     @api.doc(description="Create a new athlete")
+    @validate_json(['user_id', 'primary_sport_id', 'primary_position_id', 'date_of_birth'])
     def post(self):
         data = request.get_json() or {}
         athlete = AthleteProfile(
@@ -58,6 +60,7 @@ class AthleteResource(Resource):
         return jsonify(athlete.to_dict())
 
     @api.doc(description="Update an athlete")
+    @validate_json([])
     def put(self, athlete_id):
         athlete = AthleteProfile.query.get_or_404(athlete_id)
         data = request.get_json() or {}
@@ -146,6 +149,7 @@ class AthleteStats(Resource):
         return jsonify([s.to_dict() for s in stats])
 
     @api.doc(description="Add or update a stat")
+    @validate_json(['name'])
     def post(self, athlete_id):
         AthleteProfile.query.get_or_404(athlete_id)
         data = request.get_json() or {}
@@ -177,6 +181,7 @@ class StatResource(Resource):
         return '', 204
       
 @bp.route('/athletes', methods=['POST'])
+@validate_json(['user_id', 'primary_sport_id', 'primary_position_id', 'date_of_birth'])
 def create_athlete():
     data = request.get_json() or {}
     athlete = create_athlete_service(data)
@@ -189,6 +194,7 @@ def get_athlete(athlete_id):
     return jsonify(athlete.to_dict())
 
 @bp.route('/athletes/<athlete_id>', methods=['PUT'])
+@validate_json([])
 def update_athlete(athlete_id):
     data = request.get_json() or {}
     athlete = update_athlete_service(athlete_id, data)
@@ -251,12 +257,11 @@ def download_media(media_id):
 
 # Stats endpoints
 @bp.route('/athletes/<athlete_id>/stats', methods=['POST'])
+@validate_json(['name'])
 def add_or_update_stat(athlete_id):
     AthleteProfile.query.get_or_404(athlete_id)
     data = request.get_json() or {}
     name = data.get('name')
-    if not name:
-        abort(400, 'Missing stat name')
     stat = AthleteStat.query.filter_by(athlete_id=athlete_id, name=name).first()
     if stat:
         stat.value = data.get('value')
