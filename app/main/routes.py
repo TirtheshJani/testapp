@@ -12,3 +12,9 @@ def index():
 def dashboard():
     """User dashboard."""
     return render_template('main/dashboard.html')
+
+
+@bp.route('/athletes/<string:athlete_id>')
+def athlete_view(athlete_id):
+    """Page displaying a single athlete."""
+    return render_template('main/athlete.html', athlete_id=athlete_id)
