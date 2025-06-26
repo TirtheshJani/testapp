@@ -1,9 +1,10 @@
 from flask import request, jsonify, current_app
 from datetime import date
 from functools import lru_cache
-from sqlalchemy import or_, and_
+from sqlalchemy import or_
 
-from app.api import bp
+from flask_restx import Resource
+from app.api import api
 from app import db
 from app.models import AthleteProfile, User, Sport, Position
 
@@ -75,15 +76,26 @@ def _cached_search(key):
     return [ath.to_dict() for ath in results]
 
 
-@bp.route('/athletes/search')
-def search_athletes():
+@api.route('/athletes/search')
+class AthleteSearch(Resource):
     """Search athletes with optional filters."""
-    args = request.args.to_dict(flat=True)
-    key = _cache_key(args)
-    results = _cached_search(key)
 
-    # Simple analytics logging
-    if current_app:
-        current_app.logger.info('search query: %s', key)
+    @api.doc(params={
+        'q': 'Free text search',
+        'sport': 'Sport code or id',
+        'min_age': 'Minimum age',
+        'max_age': 'Maximum age',
+        'min_height': 'Minimum height (cm)',
+        'max_height': 'Maximum height (cm)',
+        'min_weight': 'Minimum weight (kg)',
+        'max_weight': 'Maximum weight (kg)',
+    }, description="Search athletes with optional filters")
+    def get(self):
+        args = request.args.to_dict(flat=True)
+        key = _cache_key(args)
+        results = _cached_search(key)
 
-    return jsonify({'results': results, 'count': len(results)})
+        if current_app:
+            current_app.logger.info('search query: %s', key)
+
+        return jsonify({'results': results, 'count': len(results)})
