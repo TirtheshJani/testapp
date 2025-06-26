@@ -11,21 +11,6 @@ def login():
     if current_user.is_authenticated:
         return redirect(url_for('main.dashboard'))
 
-    form = LoginForm()
-    if form.validate_on_submit():
-        user = User.query.filter(
-            (User.username == form.username_or_email.data) |
-            (User.email == form.username_or_email.data)
-        ).first()
-        if user and user.check_password(form.password.data):
-            login_user(user)
-            user.login_count = (user.login_count or 0) + 1
-            db.session.commit()
-            flash('Logged in successfully.', 'success')
-            next_page = request.args.get('next')
-            return redirect(next_page or url_for('main.dashboard'))
-        flash('Invalid credentials.', 'danger')
-    return render_template('auth/login.html', form=form)
 
 @bp.route('/logout')
 def logout():
