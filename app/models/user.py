@@ -63,6 +63,7 @@ class User(UserMixin, BaseModel):
         """Check if user has a specific role."""
         return any(role.name == role_name for role in self.roles)
     
+    @property
     def is_active(self):
         """Check if user account is active."""
         return self.status == UserStatus.ACTIVE
