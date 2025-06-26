@@ -34,7 +34,7 @@ def create_app(config_name='development'):
     app.register_blueprint(auth_bp, url_prefix='/auth')
 
     from app.api import bp as api_bp
-    app.register_blueprint(api_bp, url_prefix='/api')
+ main
     
     # User loader for Flask-Login
     @login_manager.user_loader
