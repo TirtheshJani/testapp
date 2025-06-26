@@ -13,3 +13,16 @@ Query parameters:
 - `min_weight` / `max_weight` – filter by weight in kilograms
 
 The endpoint returns a JSON object containing the matched athletes ordered by overall rating.
+
+## Local Development with Docker
+
+1. Ensure you have [Docker](https://docs.docker.com/get-docker/) installed.
+2. Build and start the containers:
+
+   ```bash
+   docker-compose up --build
+   ```
+3. Visit `http://localhost:5000` to access the application.
+4. PostgreSQL is exposed on port `5432` with default credentials `postgres/postgres` and the database `sport_agency_dev`.
+
+Application code is mounted into the container for live reloading during development.
