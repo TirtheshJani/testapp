@@ -3,48 +3,41 @@ from app.api import bp
 from app import db
 from app.models import AthleteProfile, AthleteMedia, AthleteStat
 from app.services.media_service import MediaService
+from app.services.athlete_service import (
+    create_athlete as create_athlete_service,
+    get_athlete as get_athlete_service,
+    update_athlete as update_athlete_service,
+    delete_athlete as delete_athlete_service,
+    list_athletes as list_athletes_service,
+)
 
 @bp.route('/athletes', methods=['POST'])
 def create_athlete():
     data = request.get_json() or {}
-    athlete = AthleteProfile(
-        user_id=data.get('user_id'),
-        primary_sport_id=data.get('primary_sport_id'),
-        primary_position_id=data.get('primary_position_id'),
-        date_of_birth=data.get('date_of_birth'),
-    )
-    db.session.add(athlete)
-    db.session.commit()
+    athlete = create_athlete_service(data)
     return jsonify(athlete.to_dict()), 201
 
 @bp.route('/athletes/<athlete_id>', methods=['GET'])
 def get_athlete(athlete_id):
-    athlete = AthleteProfile.query.get_or_404(athlete_id)
+    athlete = get_athlete_service(athlete_id)
     return jsonify(athlete.to_dict())
 
 @bp.route('/athletes/<athlete_id>', methods=['PUT'])
 def update_athlete(athlete_id):
-    athlete = AthleteProfile.query.get_or_404(athlete_id)
     data = request.get_json() or {}
-    for field in ['primary_sport_id', 'primary_position_id', 'bio']:
-        if field in data:
-            setattr(athlete, field, data[field])
-    db.session.commit()
+    athlete = update_athlete_service(athlete_id, data)
     return jsonify(athlete.to_dict())
 
 @bp.route('/athletes/<athlete_id>', methods=['DELETE'])
 def delete_athlete(athlete_id):
-    athlete = AthleteProfile.query.get_or_404(athlete_id)
-    athlete.is_deleted = True
-    db.session.commit()
+    delete_athlete_service(athlete_id)
     return '', 204
 
 @bp.route('/athletes', methods=['GET'])
 def list_athletes():
     page = request.args.get('page', 1, type=int)
     per_page = request.args.get('per_page', 10, type=int)
-    q = AthleteProfile.query.filter_by(is_deleted=False)
-    pagination = q.paginate(page=page, per_page=per_page, error_out=False)
+    pagination = list_athletes_service(page, per_page)
     data = [a.to_dict() for a in pagination.items]
     return jsonify({'items': data, 'total': pagination.total})
 
