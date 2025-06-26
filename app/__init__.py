@@ -1,8 +1,10 @@
 from flask import Flask
+from flask import jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_login import LoginManager
 from config import config
+from werkzeug.exceptions import HTTPException
 
 # Initialize extensions
 db = SQLAlchemy()
@@ -36,6 +38,19 @@ def create_app(config_name='development'):
     from app.api import bp as api_bp
     app.register_blueprint(api_bp)
 
+    # Error handlers to return JSON responses
+    @app.errorhandler(HTTPException)
+    def handle_http_error(error):
+        response = jsonify({'error': error.description})
+        response.status_code = error.code or 500
+        return response
+
+    @app.errorhandler(Exception)
+    def handle_generic_error(error):
+        app.logger.exception(error)
+        response = jsonify({'error': 'Internal Server Error'})
+        response.status_code = 500
+        return response
 
     # User loader for Flask-Login
     @login_manager.user_loader

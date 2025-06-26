@@ -32,3 +32,17 @@ def test_get_athlete(client):
     assert resp.status_code == 200
     data = json.loads(resp.data)
     assert data['athlete_id'] == athlete.athlete_id
+
+
+def test_create_athlete_missing_field(client):
+    resp = client.post('/api/athletes', json={})
+    assert resp.status_code == 400
+    data = json.loads(resp.data)
+    assert 'error' in data
+
+
+def test_404_returns_json(client):
+    resp = client.get('/api/athletes/nonexistent')
+    assert resp.status_code == 404
+    data = json.loads(resp.data)
+    assert 'error' in data
