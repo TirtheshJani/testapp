@@ -7,7 +7,7 @@ def login():
     """Display login page with OAuth options."""
     if current_user.is_authenticated:
         return redirect(url_for('main.dashboard'))
-    return render_template('auth/login.html')
+    return render_template('main/login.html')
 
 @bp.route('/logout')
 def logout():
