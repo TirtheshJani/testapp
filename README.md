@@ -15,6 +15,11 @@ Query parameters:
 The endpoint returns a JSON object containing the matched athletes ordered by overall rating.
 
 
+## Frontend Development
+
+See `frontend/README.md` for running the React development server.
+=======
+
 ## Logs
 
 Application logs are written to `logs/app.log` inside the project directory.
@@ -31,3 +36,4 @@ Application logs are written to `logs/app.log` inside the project directory.
 4. PostgreSQL is exposed on port `5432` with default credentials `postgres/postgres` and the database `sport_agency_dev`.
 
 Application code is mounted into the container for live reloading during development.
+
