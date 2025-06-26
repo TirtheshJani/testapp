@@ -8,14 +8,28 @@ app = create_app(os.getenv('FLASK_ENV') or 'development')
 @app.shell_context_processor
 def make_shell_context():
     # Import models here to avoid circular imports
-    from app.models import User, Role, AthleteProfile, Sport, Position
+    from app.models import (
+        User,
+        Role,
+        AthleteProfile,
+        Athlete,
+        AthleteStat,
+        AthleteMedia,
+        AthleteAchievement,
+        Sport,
+        Position,
+    )
     return {
         'db': db,
         'User': User,
         'Role': Role,
         'AthleteProfile': AthleteProfile,
+        'Athlete': Athlete,
+        'AthleteStat': AthleteStat,
+        'AthleteMedia': AthleteMedia,
+        'AthleteAchievement': AthleteAchievement,
         'Sport': Sport,
-        'Position': Position
+        'Position': Position,
     }
 
 @app.cli.command()
