@@ -14,6 +14,11 @@ Query parameters:
 
 The endpoint returns a JSON object containing the matched athletes ordered by overall rating.
 
+
+## Logs
+
+Application logs are written to `logs/app.log` inside the project directory.
+=======
 ## Local Development with Docker
 
 1. Ensure you have [Docker](https://docs.docker.com/get-docker/) installed.

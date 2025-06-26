@@ -1,5 +1,6 @@
 import os
 import uuid
+import logging
 from werkzeug.utils import secure_filename
 from PIL import Image
 
@@ -18,12 +19,14 @@ class MediaService:
         filename = f"{uuid.uuid4().hex}{ext}"
         path = os.path.join(directory, secure_filename(filename))
         file_storage.save(path)
+        logging.getLogger(__name__).info("Saved media file %s", path)
         return path, filename
 
     @staticmethod
     def delete_file(path):
         try:
             os.remove(path)
+            logging.getLogger(__name__).info("Deleted media file %s", path)
         except FileNotFoundError:
             pass
 
