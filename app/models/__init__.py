@@ -5,10 +5,13 @@ from .oauth import OAuthProvider, UserOAuthAccount
 from .sports import Sport, Position
 from .user import User
 from .athlete import AthleteProfile
+from .media import AthleteMedia
+from .stats import AthleteStat
 
 __all__ = [
     'BaseModel',
     'User', 'Role', 'UserRole', 
     'OAuthProvider', 'UserOAuthAccount',
-    'AthleteProfile', 'Sport', 'Position'
+    'AthleteProfile', 'Sport', 'Position',
+    'AthleteMedia', 'AthleteStat'
 ]
