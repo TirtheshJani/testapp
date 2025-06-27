@@ -10,5 +10,9 @@ from .skill import AthleteSkill
 __all__ = [
     'User', 'Role', 'UserRole',
     'UserOAuthAccount', 'Sport', 'Position',
+    'AthleteProfile', 'AthleteSkill', 'AthleteStat'
+]
+
     'AthleteProfile', 'AthleteMedia', 'AthleteStat', 'AthleteSkill'
 ]
+

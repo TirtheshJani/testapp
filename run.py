@@ -9,6 +9,7 @@ from app.models import (
     Position,
     AthleteProfile,
     AthleteSkill,
+    AthleteStat,
 )
 from flask.cli import with_appcontext
 import click
@@ -27,6 +28,8 @@ def make_shell_context():
         'Sport': Sport,
         'Position': Position,
         'AthleteProfile': AthleteProfile,
+        'AthleteSkill': AthleteSkill,
+        'AthleteStat': AthleteStat,
         'AthleteSkill': AthleteSkill
     }
 
@@ -159,6 +162,122 @@ def init_db():
 
     db.session.commit()
     click.echo('Database initialized with default roles, sports and sample athlete.')
+
+
+@app.cli.command()
+@with_appcontext
+def seed_demo():
+    """Insert demo users and athlete data."""
+    from datetime import date
+
+    # Ensure base tables and reference data exist
+    init_db()
+
+    demo_users = [
+        {
+            'username': 'ljames',
+            'email': 'lebron@example.com',
+            'first_name': 'LeBron',
+            'last_name': 'James',
+            'dob': date(1984, 12, 30),
+            'sport': 'NBA',
+            'position': 'SF',
+            'nationality': 'USA',
+            'skills': [
+                {'name': 'Playmaking', 'level': 'expert'},
+                {'name': 'Scoring', 'level': 'expert'},
+            ],
+            'stats': [
+                {'name': 'PPG', 'value': '27.0'},
+                {'name': 'RPG', 'value': '7.4'},
+            ],
+        },
+        {
+            'username': 'tbrady',
+            'email': 'brady@example.com',
+            'first_name': 'Tom',
+            'last_name': 'Brady',
+            'dob': date(1977, 8, 3),
+            'sport': 'NFL',
+            'position': 'QB',
+            'nationality': 'USA',
+            'skills': [
+                {'name': 'Passing', 'level': 'expert'},
+                {'name': 'Leadership', 'level': 'expert'},
+            ],
+            'stats': [
+                {'name': 'TDs', 'value': '649'},
+            ],
+        },
+        {
+            'username': 'scrosby',
+            'email': 'crosby@example.com',
+            'first_name': 'Sidney',
+            'last_name': 'Crosby',
+            'dob': date(1987, 8, 7),
+            'sport': 'NHL',
+            'position': 'C',
+            'nationality': 'CAN',
+            'skills': [
+                {'name': 'Stickhandling', 'level': 'expert'},
+                {'name': 'Vision', 'level': 'expert'},
+            ],
+            'stats': [
+                {'name': 'Points', 'value': '1525'},
+            ],
+        },
+    ]
+
+    for info in demo_users:
+        if User.query.filter_by(username=info['username']).first():
+            continue
+
+        user = User(
+            username=info['username'],
+            email=info['email'],
+            first_name=info['first_name'],
+            last_name=info['last_name'],
+        )
+        db.session.add(user)
+        db.session.flush()
+
+        sport = Sport.query.filter_by(code=info['sport']).first()
+        position = None
+        if sport:
+            position = Position.query.filter_by(
+                sport_id=sport.sport_id, code=info['position']
+            ).first()
+
+        profile = AthleteProfile(
+            user_id=user.user_id,
+            primary_sport_id=sport.sport_id if sport else None,
+            primary_position_id=position.position_id if position else None,
+            date_of_birth=info['dob'],
+            nationality=info['nationality'],
+        )
+        db.session.add(profile)
+        db.session.flush()
+
+        for sk in info['skills']:
+            db.session.add(
+                AthleteSkill(
+                    athlete_id=profile.athlete_id,
+                    name=sk['name'],
+                    level=sk['level'],
+                )
+            )
+
+        for st in info['stats']:
+            db.session.add(
+                AthleteStat(
+                    athlete_id=profile.athlete_id,
+                    name=st['name'],
+                    value=st['value'],
+                )
+            )
+
+    db.session.commit()
+    click.echo('Demo athlete data created.')
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5000)
