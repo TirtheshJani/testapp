@@ -24,6 +24,8 @@ def _cached_search(key):
     params = dict(item.split('=', 1) for item in key.split('&') if '=' in item)
     q = params.get('q', '')
     sport = params.get('sport')
+    position = params.get('position')
+    team = params.get('team')
     min_age = int(params['min_age']) if 'min_age' in params else None
     max_age = int(params['max_age']) if 'max_age' in params else None
     min_height = int(params['min_height']) if 'min_height' in params else None
@@ -43,6 +45,20 @@ def _cached_search(key):
             query = query.filter(AthleteProfile.primary_sport_id == int(sport))
         else:
             query = query.filter(Sport.code.ilike(sport))
+
+    if position:
+        if position.isdigit():
+            query = query.filter(
+                AthleteProfile.primary_position_id == int(position)
+            )
+        else:
+            pattern = f"%{position}%"
+            query = query.filter(
+                or_(Position.code.ilike(position), Position.name.ilike(pattern))
+            )
+
+    if team:
+        query = query.filter(AthleteProfile.current_team.ilike(f"%{team}%"))
 
     if q:
         pattern = f"%{q}%"
@@ -89,6 +105,8 @@ class AthleteSearch(Resource):
     @api.doc(params={
         'q': 'Free text search',
         'sport': 'Sport code or id',
+        'position': 'Position code or id',
+        'team': 'Current team name',
         'min_age': 'Minimum age',
         'max_age': 'Maximum age',
         'min_height': 'Minimum height (cm)',
