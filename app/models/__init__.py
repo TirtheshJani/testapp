@@ -7,4 +7,3 @@ from .user import User, UserStatus
 from .athlete import AthleteProfile
 from .media import AthleteMedia
 from .stats import AthleteStat
-
