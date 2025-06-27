@@ -1,5 +1,6 @@
 from flask import request, send_file, abort, jsonify
 from app.utils.validators import validate_json, validate_params
+from app.utils.auth import login_or_token_required
 from flask_restx import Resource
 import logging
 
@@ -34,6 +35,7 @@ class AthleteList(Resource):
         return jsonify({'items': data, 'total': pagination.total})
 
     @api.doc(description="Create a new athlete")
+    @login_or_token_required
     @validate_json(['user_id', 'primary_sport_id', 'primary_position_id', 'date_of_birth'])
     def post(self):
         data = request.get_json() or {}
@@ -63,6 +65,7 @@ class AthleteResource(Resource):
         return jsonify(athlete.to_dict())
 
     @api.doc(description="Update an athlete")
+    @login_or_token_required
     @validate_json([])
     def put(self, athlete_id):
         athlete = (
@@ -78,6 +81,7 @@ class AthleteResource(Resource):
         return jsonify(athlete.to_dict())
 
     @api.doc(description="Delete an athlete")
+    @login_or_token_required
     def delete(self, athlete_id):
         athlete = (
             AthleteProfile.query.filter_by(athlete_id=athlete_id, is_deleted=False)
@@ -101,6 +105,7 @@ class AthleteMediaList(Resource):
         return jsonify([m.to_dict() for m in media])
 
     @api.doc(description="Upload a media file", params={'file': 'File upload', 'media_type': 'Type of media'})
+    @login_or_token_required
     def post(self, athlete_id):
         athlete = (
             AthleteProfile.query.filter_by(athlete_id=athlete_id, is_deleted=False)
@@ -129,6 +134,7 @@ class MediaResource(Resource):
     """Delete media."""
 
     @api.doc(description="Delete a media entry")
+    @login_or_token_required
     def delete(self, media_id):
         media = AthleteMedia.query.get_or_404(media_id)
         MediaService.delete_file(media.file_path)
@@ -161,6 +167,7 @@ class AthleteStats(Resource):
         return jsonify([s.to_dict() for s in stats])
 
     @api.doc(description="Add or update a stat")
+    @login_or_token_required
     @validate_json(['name'])
     def post(self, athlete_id):
         AthleteProfile.query.filter_by(athlete_id=athlete_id, is_deleted=False).first_or_404()
@@ -202,6 +209,7 @@ class StatResource(Resource):
     """Delete a stat."""
 
     @api.doc(description="Delete a stat")
+    @login_or_token_required
     def delete(self, stat_id):
         stat = AthleteStat.query.get_or_404(stat_id)
         db.session.delete(stat)
@@ -210,6 +218,7 @@ class StatResource(Resource):
         return '', 204
       
 @bp.route('/athletes', methods=['POST'])
+@login_or_token_required
 @validate_json(['user_id', 'primary_sport_id', 'primary_position_id', 'date_of_birth'])
 def create_athlete():
     data = request.get_json() or {}
@@ -223,6 +232,7 @@ def get_athlete(athlete_id):
     return jsonify(athlete.to_dict())
 
 @bp.route('/athletes/<athlete_id>', methods=['PUT'])
+@login_or_token_required
 @validate_json([])
 def update_athlete(athlete_id):
     data = request.get_json() or {}
@@ -231,6 +241,7 @@ def update_athlete(athlete_id):
     return jsonify(athlete.to_dict())
 
 @bp.route('/athletes/<athlete_id>', methods=['DELETE'])
+@login_or_token_required
 def delete_athlete(athlete_id):
     delete_athlete_service(athlete_id)
     logging.getLogger(__name__).info("Deleted athlete %s", athlete_id)
@@ -246,6 +257,7 @@ def list_athletes():
 
 # Media endpoints
 @bp.route('/athletes/<athlete_id>/media', methods=['POST'])
+@login_or_token_required
 def upload_media(athlete_id):
     athlete = AthleteProfile.query.get_or_404(athlete_id)
     if 'file' not in request.files:
@@ -271,6 +283,7 @@ def list_media(athlete_id):
     return jsonify([m.to_dict() for m in media])
 
 @bp.route('/media/<media_id>', methods=['DELETE'])
+@login_or_token_required
 def delete_media(media_id):
     media = AthleteMedia.query.get_or_404(media_id)
     MediaService.delete_file(media.file_path)
@@ -286,6 +299,7 @@ def download_media(media_id):
 
 # Stats endpoints
 @bp.route('/athletes/<athlete_id>/stats', methods=['POST'])
+@login_or_token_required
 @validate_json(['name'])
 def add_or_update_stat(athlete_id):
     AthleteProfile.query.get_or_404(athlete_id)
@@ -325,6 +339,7 @@ def get_stats(athlete_id):
     return jsonify([s.to_dict() for s in stats])
 
 @bp.route('/stats/<stat_id>', methods=['DELETE'])
+@login_or_token_required
 def delete_stat(stat_id):
     stat = AthleteStat.query.get_or_404(stat_id)
     db.session.delete(stat)
