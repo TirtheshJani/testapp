@@ -9,13 +9,16 @@ from app.athletes.forms import AthleteForm
 @bp.route('/')
 @login_required
 def index():
-    athletes = AthleteProfile.query.all()
+    athletes = AthleteProfile.query.filter_by(is_deleted=False).all()
     return render_template('athletes/list.html', athletes=athletes)
 
 @bp.route('/<athlete_id>')
 @login_required
 def detail(athlete_id):
-    athlete = AthleteProfile.query.get_or_404(athlete_id)
+    athlete = (
+        AthleteProfile.query.filter_by(athlete_id=athlete_id, is_deleted=False)
+        .first_or_404()
+    )
     return render_template('athletes/detail.html', athlete=athlete)
 
 @bp.route('/new', methods=['GET', 'POST'])
@@ -41,7 +44,10 @@ def create():
 @bp.route('/<athlete_id>/edit', methods=['GET', 'POST'])
 @login_required
 def edit(athlete_id):
-    athlete = AthleteProfile.query.get_or_404(athlete_id)
+    athlete = (
+        AthleteProfile.query.filter_by(athlete_id=athlete_id, is_deleted=False)
+        .first_or_404()
+    )
     form = AthleteForm(obj=athlete.user)
     if form.validate_on_submit():
         athlete.user.first_name = form.first_name.data

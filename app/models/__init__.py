@@ -3,6 +3,7 @@ from .role import Role, UserRole
 from .oauth import UserOAuthAccount
 from .sport import Sport, Position
 from .athlete import AthleteProfile
+from .media import AthleteMedia
 from .stats import AthleteStat
 from .skill import AthleteSkill
 
@@ -11,3 +12,7 @@ __all__ = [
     'UserOAuthAccount', 'Sport', 'Position',
     'AthleteProfile', 'AthleteSkill', 'AthleteStat'
 ]
+
+    'AthleteProfile', 'AthleteMedia', 'AthleteStat', 'AthleteSkill'
+]
+

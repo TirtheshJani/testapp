@@ -11,6 +11,9 @@ class AthleteSkill(BaseModel):
     level = db.Column(db.String(50))
 
     athlete = db.relationship('AthleteProfile', backref='skills')
+    level = db.Column(db.Integer)
+
+    athlete = db.relationship('AthleteProfile', back_populates='skills')
 
     __table_args__ = (
         db.Index('idx_skills_athlete', 'athlete_id'),
@@ -18,3 +21,4 @@ class AthleteSkill(BaseModel):
 
     def __repr__(self):
         return f'<AthleteSkill {self.name}>'
+        return f'<AthleteSkill {self.skill_id}>'

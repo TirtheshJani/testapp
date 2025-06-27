@@ -18,12 +18,18 @@ def create_athlete(data):
 
 def get_athlete(athlete_id):
     """Retrieve an athlete profile by id or raise 404."""
-    return AthleteProfile.query.get_or_404(athlete_id)
+    return (
+        AthleteProfile.query.filter_by(athlete_id=athlete_id, is_deleted=False)
+        .first_or_404()
+    )
 
 
 def update_athlete(athlete_id, data):
     """Update an existing athlete profile."""
-    athlete = AthleteProfile.query.get_or_404(athlete_id)
+    athlete = (
+        AthleteProfile.query.filter_by(athlete_id=athlete_id, is_deleted=False)
+        .first_or_404()
+    )
     for field in ['primary_sport_id', 'primary_position_id', 'bio']:
         if field in data:
             setattr(athlete, field, data[field])
@@ -33,7 +39,10 @@ def update_athlete(athlete_id, data):
 
 def delete_athlete(athlete_id):
     """Soft delete an athlete profile."""
-    athlete = AthleteProfile.query.get_or_404(athlete_id)
+    athlete = (
+        AthleteProfile.query.filter_by(athlete_id=athlete_id, is_deleted=False)
+        .first_or_404()
+    )
     athlete.is_deleted = True
     db.session.commit()
     return True
