@@ -7,7 +7,7 @@ load_dotenv(os.path.join(basedir, '.env'))
 class Config:
     SECRET_KEY = os.environ.get('SECRET_KEY') or 'dev-secret-key-change-me'
     SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or \
-        'postgresql://postgres:Kafka%40221K@localhost:5432/sport_agency_dev'
+        'postgresql://postgres:postgres@localhost:5432/sport_agency_dev'
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     
     # Session Configuration
