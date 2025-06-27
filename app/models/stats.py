@@ -9,6 +9,8 @@ class AthleteStat(BaseModel):
     athlete_id = db.Column(db.String(36), db.ForeignKey('athlete_profiles.athlete_id', ondelete='CASCADE'), nullable=False)
     name = db.Column(db.String(100), nullable=False)
     value = db.Column(db.String(100))
+    stat_type = db.Column(db.String(100))
+    season = db.Column(db.String(20))
 
     athlete = db.relationship('AthleteProfile', backref='stats')
 
