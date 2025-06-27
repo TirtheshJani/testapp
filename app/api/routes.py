@@ -168,11 +168,28 @@ class AthleteStats(Resource):
         name = data.get('name')
         if not name:
             abort(400, 'Missing stat name')
-        stat = AthleteStat.query.filter_by(athlete_id=athlete_id, name=name).first()
+        stat_type = data.get('stat_type')
+        season = data.get('season')
+        stat = AthleteStat.query.filter_by(
+            athlete_id=athlete_id,
+            name=name,
+            stat_type=stat_type,
+            season=season,
+        ).first()
         if stat:
             stat.value = data.get('value')
+            if stat_type is not None:
+                stat.stat_type = stat_type
+            if season is not None:
+                stat.season = season
         else:
-            stat = AthleteStat(athlete_id=athlete_id, name=name, value=data.get('value'))
+            stat = AthleteStat(
+                athlete_id=athlete_id,
+                name=name,
+                value=data.get('value'),
+                stat_type=stat_type,
+                season=season,
+            )
             db.session.add(stat)
         db.session.commit()
         logging.getLogger(__name__).info("Updated stat %s for athlete %s", name, athlete_id)
@@ -274,11 +291,28 @@ def add_or_update_stat(athlete_id):
     AthleteProfile.query.get_or_404(athlete_id)
     data = request.get_json() or {}
     name = data.get('name')
-    stat = AthleteStat.query.filter_by(athlete_id=athlete_id, name=name).first()
+    stat_type = data.get('stat_type')
+    season = data.get('season')
+    stat = AthleteStat.query.filter_by(
+        athlete_id=athlete_id,
+        name=name,
+        stat_type=stat_type,
+        season=season,
+    ).first()
     if stat:
         stat.value = data.get('value')
+        if stat_type is not None:
+            stat.stat_type = stat_type
+        if season is not None:
+            stat.season = season
     else:
-        stat = AthleteStat(athlete_id=athlete_id, name=name, value=data.get('value'))
+        stat = AthleteStat(
+            athlete_id=athlete_id,
+            name=name,
+            value=data.get('value'),
+            stat_type=stat_type,
+            season=season,
+        )
         db.session.add(stat)
     db.session.commit()
     logging.getLogger(__name__).info("Updated stat %s for athlete %s", name, athlete_id)
