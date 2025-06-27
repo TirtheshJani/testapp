@@ -67,7 +67,48 @@ def test_404_returns_json(client):
     assert 'error' in data or 'message' in data
 
 
+
 def test_create_athlete_requires_auth(client):
     resp = client.post('/api/athletes', json={})
     assert resp.status_code == 401
 
+def _create_athlete():
+    user = User(username='u_skill', email='skill@example.com', first_name='S', last_name='Kill')
+    user.save()
+    athlete = AthleteProfile(user_id=user.user_id, date_of_birth=date.fromisoformat('2000-01-01'))
+    athlete.save()
+    return athlete
+
+
+def test_skill_crud(client):
+    athlete = _create_athlete()
+
+    resp = client.post(
+        f'/api/athletes/{athlete.athlete_id}/skills',
+        json={'name': 'Speed', 'level': 5}
+    )
+    assert resp.status_code == 201
+    skill = json.loads(resp.data)
+
+    resp = client.get(f'/api/athletes/{athlete.athlete_id}/skills')
+    assert resp.status_code == 200
+    data = json.loads(resp.data)
+    assert len(data) == 1
+
+    resp = client.put(f"/api/skills/{skill['skill_id']}", json={'level': 7})
+    assert resp.status_code == 200
+    updated = json.loads(resp.data)
+    assert updated['level'] == 7
+
+    resp = client.delete(f"/api/skills/{skill['skill_id']}")
+    assert resp.status_code == 204
+
+    resp = client.get(f'/api/athletes/{athlete.athlete_id}/skills')
+    data = json.loads(resp.data)
+    assert data == []
+
+
+def test_create_skill_missing_name(client):
+    athlete = _create_athlete()
+    resp = client.post(f'/api/athletes/{athlete.athlete_id}/skills', json={})
+    assert resp.status_code == 400
