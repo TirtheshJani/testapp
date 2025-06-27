@@ -285,4 +285,3 @@ def delete_stat(stat_id):
     db.session.commit()
     logging.getLogger(__name__).info("Deleted stat %s", stat_id)
     return '', 204
-

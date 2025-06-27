@@ -80,3 +80,4 @@ class AthleteProfile(BaseModel):
         if self.user:
             data['user'] = {'full_name': self.user.full_name}
         return data
+
