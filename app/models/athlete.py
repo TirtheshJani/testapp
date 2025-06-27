@@ -49,6 +49,7 @@ class AthleteProfile(BaseModel):
     user = db.relationship('User', back_populates='athlete_profile')
     primary_sport = db.relationship('Sport', back_populates='athletes')
     primary_position = db.relationship('Position')
+    skills = db.relationship('AthleteSkill', back_populates='athlete', cascade='all, delete-orphan')
     
     # Constraints
     __table_args__ = (
