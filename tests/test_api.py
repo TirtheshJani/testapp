@@ -8,6 +8,7 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')
 from datetime import date
 from app import create_app, db
 from app.models import User, AthleteProfile
+from app.models.oauth import UserOAuthAccount
 
 @pytest.fixture
 def app_instance():
@@ -23,6 +24,22 @@ def client(app_instance):
     return app_instance.test_client()
 
 
+@pytest.fixture
+def auth_headers(app_instance):
+    with app_instance.app_context():
+        user = User(username='authuser', email='auth@example.com', first_name='A', last_name='User')
+        user.save()
+        oauth = UserOAuthAccount(
+            user_id=user.user_id,
+            provider_name='test',
+            provider_user_id='123',
+            access_token='testtoken'
+        )
+        db.session.add(oauth)
+        db.session.commit()
+    return {'Authorization': 'Bearer testtoken'}
+
+
 def test_get_athlete(client):
     user = User(username='u1', email='u1@example.com', first_name='U', last_name='One')
     user.save()
@@ -36,8 +53,8 @@ def test_get_athlete(client):
     assert data['user']['full_name'] == user.full_name
 
 
-def test_create_athlete_missing_field(client):
-    resp = client.post('/api/athletes', json={})
+def test_create_athlete_missing_field(client, auth_headers):
+    resp = client.post('/api/athletes', json={}, headers=auth_headers)
     assert resp.status_code == 400
     data = json.loads(resp.data)
     assert 'error' in data or 'message' in data
@@ -48,3 +65,9 @@ def test_404_returns_json(client):
     assert resp.status_code == 404
     data = json.loads(resp.data)
     assert 'error' in data or 'message' in data
+
+
+def test_create_athlete_requires_auth(client):
+    resp = client.post('/api/athletes', json={})
+    assert resp.status_code == 401
+
