@@ -17,7 +17,7 @@
             <div class="card-body">
                 <h5 class="card-title">User Information</h5>
                 <p><strong>Email:</strong> {{ current_user.email }}</p>
-                <p><strong>Status:</strong> {{ current_user.status.value.title() }}</p>
+                <p><strong>Status:</strong> {{ 'Active' if current_user.is_active else 'Inactive' }}</p>
                 <p><strong>Login Count:</strong> {{ current_user.login_count or 0 }}</p>
             </div>
         </div>
