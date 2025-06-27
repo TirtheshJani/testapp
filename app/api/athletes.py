@@ -31,7 +31,12 @@ def _cached_search(key):
     min_weight = float(params['min_weight']) if 'min_weight' in params else None
     max_weight = float(params['max_weight']) if 'max_weight' in params else None
 
-    query = AthleteProfile.query.join(User).outerjoin(Sport).outerjoin(Position)
+    query = (
+        AthleteProfile.query.filter_by(is_deleted=False)
+        .join(User)
+        .outerjoin(Sport)
+        .outerjoin(Position)
+    )
 
     if sport:
         if sport.isdigit():

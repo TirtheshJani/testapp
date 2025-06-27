@@ -56,13 +56,19 @@ class AthleteResource(Resource):
 
     @api.doc(description="Get an athlete")
     def get(self, athlete_id):
-        athlete = AthleteProfile.query.get_or_404(athlete_id)
+        athlete = (
+            AthleteProfile.query.filter_by(athlete_id=athlete_id, is_deleted=False)
+            .first_or_404()
+        )
         return jsonify(athlete.to_dict())
 
     @api.doc(description="Update an athlete")
     @validate_json([])
     def put(self, athlete_id):
-        athlete = AthleteProfile.query.get_or_404(athlete_id)
+        athlete = (
+            AthleteProfile.query.filter_by(athlete_id=athlete_id, is_deleted=False)
+            .first_or_404()
+        )
         data = request.get_json() or {}
         for field in ['primary_sport_id', 'primary_position_id', 'bio']:
             if field in data:
@@ -73,7 +79,10 @@ class AthleteResource(Resource):
 
     @api.doc(description="Delete an athlete")
     def delete(self, athlete_id):
-        athlete = AthleteProfile.query.get_or_404(athlete_id)
+        athlete = (
+            AthleteProfile.query.filter_by(athlete_id=athlete_id, is_deleted=False)
+            .first_or_404()
+        )
         athlete.is_deleted = True
         db.session.commit()
         logging.getLogger(__name__).info("Deleted athlete %s", athlete.id)
@@ -87,13 +96,16 @@ class AthleteMediaList(Resource):
 
     @api.doc(description="List media for an athlete")
     def get(self, athlete_id):
-        AthleteProfile.query.get_or_404(athlete_id)
+        AthleteProfile.query.filter_by(athlete_id=athlete_id, is_deleted=False).first_or_404()
         media = AthleteMedia.query.filter_by(athlete_id=athlete_id).all()
         return jsonify([m.to_dict() for m in media])
 
     @api.doc(description="Upload a media file", params={'file': 'File upload', 'media_type': 'Type of media'})
     def post(self, athlete_id):
-        athlete = AthleteProfile.query.get_or_404(athlete_id)
+        athlete = (
+            AthleteProfile.query.filter_by(athlete_id=athlete_id, is_deleted=False)
+            .first_or_404()
+        )
         if 'file' not in request.files:
             abort(400, 'No file provided')
         file = request.files['file']
@@ -144,14 +156,14 @@ class AthleteStats(Resource):
 
     @api.doc(description="Get stats for an athlete")
     def get(self, athlete_id):
-        AthleteProfile.query.get_or_404(athlete_id)
+        AthleteProfile.query.filter_by(athlete_id=athlete_id, is_deleted=False).first_or_404()
         stats = AthleteStat.query.filter_by(athlete_id=athlete_id).all()
         return jsonify([s.to_dict() for s in stats])
 
     @api.doc(description="Add or update a stat")
     @validate_json(['name'])
     def post(self, athlete_id):
-        AthleteProfile.query.get_or_404(athlete_id)
+        AthleteProfile.query.filter_by(athlete_id=athlete_id, is_deleted=False).first_or_404()
         data = request.get_json() or {}
         name = data.get('name')
         if not name:
