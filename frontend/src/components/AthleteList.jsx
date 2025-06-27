@@ -48,9 +48,9 @@ export default function AthleteList() {
   }, []);
 
   return (
-    <div>
+    <div className="container">
       <h1>Athletes</h1>
-      <div>
+      <div className="filter-controls">
         <input
           type="text"
           placeholder="Search..."
