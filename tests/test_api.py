@@ -33,6 +33,7 @@ def test_get_athlete(client):
     assert resp.status_code == 200
     data = json.loads(resp.data)
     assert data['athlete_id'] == athlete.athlete_id
+    assert data['user']['full_name'] == user.full_name
 
 
 def test_create_athlete_missing_field(client):
