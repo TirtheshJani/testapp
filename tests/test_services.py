@@ -2,6 +2,7 @@ import os
 import io
 import sys
 import uuid
+from datetime import date
 import pytest
 from werkzeug.datastructures import FileStorage
 
@@ -41,7 +42,7 @@ def test_athlete_crud(app_ctx):
         'user_id': user.user_id,
         'primary_sport_id': None,
         'primary_position_id': None,
-        'date_of_birth': '2000-01-01'
+        'date_of_birth': date.fromisoformat('2000-01-01')
     }
     athlete = athlete_service.create_athlete(data)
     assert athlete.user_id == user.user_id

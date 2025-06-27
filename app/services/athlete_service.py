@@ -1,5 +1,6 @@
 from app import db
 from app.models import AthleteProfile
+from app.utils.pagination import paginate_query
 
 
 def create_athlete(data):
@@ -41,4 +42,4 @@ def delete_athlete(athlete_id):
 def list_athletes(page=1, per_page=10):
     """Return a pagination object of non-deleted athletes."""
     query = AthleteProfile.query.filter_by(is_deleted=False)
-    return query.paginate(page=page, per_page=per_page, error_out=False)
+    return paginate_query(query, page=page, per_page=per_page)
