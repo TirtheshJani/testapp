@@ -17,7 +17,7 @@ export default function AthleteProfile() {
   }
 
   return (
-    <div>
+    <div className="profile-container container">
       <h2>{athlete.user.full_name}</h2>
       <p>{athlete.bio}</p>
       <p>Date of Birth: {athlete.date_of_birth}</p>

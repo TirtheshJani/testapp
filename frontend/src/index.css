@@ -3,3 +3,35 @@ body {
   margin: 0;
   padding: 0;
 }
+
+/* Common container used across pages */
+.container {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+/* Filters on the athlete list page */
+.filter-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+@media (min-width: 600px) {
+  .filter-controls {
+    flex-wrap: nowrap;
+  }
+}
+
+/* Profile container styling */
+.profile-container {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 1rem;
+}
+
+.profile-container h2 {
+  margin-top: 0;
+}
