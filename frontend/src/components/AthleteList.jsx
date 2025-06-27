@@ -10,8 +10,6 @@ export default function AthleteList() {
   const [minAge, setMinAge] = useState('');
   const [maxAge, setMaxAge] = useState('');
   const [name, setName] = useState('');
-  const [position, setPosition] = useState('');
-  const [team, setTeam] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
@@ -27,8 +25,6 @@ export default function AthleteList() {
     if (minAge) params.append('min_age', minAge);
     if (maxAge) params.append('max_age', maxAge);
     if (name) params.append('name', name);
-    if (position) params.append('position', position);
-    if (team) params.append('team', team);
 
     fetch(`/api/athletes/search?${params.toString()}`)
       .then((res) => {
@@ -80,18 +76,6 @@ export default function AthleteList() {
           placeholder="Sport"
           value={sport}
           onChange={(e) => setSport(e.target.value)}
-        />
-        <input
-          type="text"
-          placeholder="Position"
-          value={position}
-          onChange={(e) => setPosition(e.target.value)}
-        />
-        <input
-          type="text"
-          placeholder="Team"
-          value={team}
-          onChange={(e) => setTeam(e.target.value)}
         />
         <input
           type="number"
