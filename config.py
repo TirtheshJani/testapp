@@ -46,7 +46,8 @@ class DevelopmentConfig(Config):
     
 class TestingConfig(Config):
     TESTING = True
-    SQLALCHEMY_DATABASE_URI = 'postgresql://postgres:Kafka%40221K@localhost:5432/sport_agency_test'
+    SQLALCHEMY_DATABASE_URI = 'sqlite:///:memory:'
+    SQLALCHEMY_ENGINE_OPTIONS = {}
     
 class ProductionConfig(Config):
     DEBUG = False

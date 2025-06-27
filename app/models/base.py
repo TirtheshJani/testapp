@@ -1,5 +1,6 @@
 from app import db
 from datetime import datetime
+from enum import Enum
 import uuid
 
 class BaseModel(db.Model):
@@ -21,5 +22,11 @@ class BaseModel(db.Model):
         return True
     
     def to_dict(self):
-        """Convert model to dictionary."""
-        return {column.name: getattr(self, column.name) for column in self.__table__.columns}
+        """Convert model to dictionary, handling Enums."""
+        result = {}
+        for column in self.__table__.columns:
+            value = getattr(self, column.name)
+            if isinstance(value, Enum):
+                value = value.value
+            result[column.name] = value
+        return result

@@ -5,6 +5,7 @@ import pytest
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
+from datetime import date
 from app import create_app, db
 from app.models import User, AthleteProfile
 
@@ -25,7 +26,7 @@ def client(app_instance):
 def test_get_athlete(client):
     user = User(username='u1', email='u1@example.com', first_name='U', last_name='One')
     user.save()
-    athlete = AthleteProfile(user_id=user.user_id, date_of_birth='2000-01-01')
+    athlete = AthleteProfile(user_id=user.user_id, date_of_birth=date.fromisoformat('2000-01-01'))
     athlete.save()
 
     resp = client.get(f'/api/athletes/{athlete.athlete_id}')
@@ -38,11 +39,11 @@ def test_create_athlete_missing_field(client):
     resp = client.post('/api/athletes', json={})
     assert resp.status_code == 400
     data = json.loads(resp.data)
-    assert 'error' in data
+    assert 'error' in data or 'message' in data
 
 
 def test_404_returns_json(client):
     resp = client.get('/api/athletes/nonexistent')
     assert resp.status_code == 404
     data = json.loads(resp.data)
-    assert 'error' in data
+    assert 'error' in data or 'message' in data

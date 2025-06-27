@@ -3,7 +3,7 @@ from app.utils.validators import validate_json, validate_params
 from flask_restx import Resource
 import logging
 
-from app.api import api
+from app.api import api, bp
 from app import db
 from app.models import AthleteProfile, AthleteMedia, AthleteStat
 from app.services.media_service import MediaService
