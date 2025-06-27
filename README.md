@@ -17,13 +17,14 @@ The endpoint returns a JSON object containing the matched athletes ordered by ov
 
 ## Frontend Development
 
-See `frontend/README.md` for running the React development server.
-=======
+The project ships with Jinja templates under `templates/main` that render a
+basic HTML/CSS interface. You can use these built-in pages without touching the
+React code. For a richer client-side experience, the React app in
+`frontend/` is available—see its README for development instructions.
 
 ## Logs
 
 Application logs are written to `logs/app.log` inside the project directory.
-=======
 ## Local Development with Docker
 
 1. Ensure you have [Docker](https://docs.docker.com/get-docker/) installed.
