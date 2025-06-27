@@ -37,3 +37,21 @@ Application logs are written to `logs/app.log` inside the project directory.
 
 Application code is mounted into the container for live reloading during development.
 
+
+## Maintenance Scripts
+
+The `scripts` directory contains simple utilities for working with the project.
+
+### backup_db.sh
+Dumps the PostgreSQL database defined in `DATABASE_URL` to a timestamped file. A backup directory may be supplied as the first argument (defaults to `backups`).
+
+```bash
+DATABASE_URL=postgresql://user:pass@host/dbname bash scripts/backup_db.sh [backup_dir]
+```
+
+### check_storage.py
+Checks that a path exists and has at least the specified free space in megabytes (defaults to `100` MB).
+
+```bash
+python scripts/check_storage.py /path/to/dir [required_mb]
+```
