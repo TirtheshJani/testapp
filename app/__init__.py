@@ -1,82 +1,79 @@
 from flask import Flask
-from flask import jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_login import LoginManager
+from authlib.integrations.flask_client import OAuth
 from config import config
-import logging
-from logging.handlers import RotatingFileHandler
-import os
-
-from werkzeug.exceptions import HTTPException
 
 # Initialize extensions
 db = SQLAlchemy()
 migrate = Migrate()
 login_manager = LoginManager()
-
+oauth = OAuth()
 
 def create_app(config_name='development'):
-    app = Flask(__name__, instance_relative_config=True)
-
-    # Load configuration
+    app = Flask(__name__)
     app.config.from_object(config[config_name])
-    config[config_name].init_app(app)
-
-    # Initialize extensions with app
+    
+    # Initialize extensions
     db.init_app(app)
     migrate.init_app(app, db)
     login_manager.init_app(app)
-
-    # Configure logging
-    if not os.path.exists('logs'):
-        os.mkdir('logs')
-    file_handler = RotatingFileHandler('logs/app.log', maxBytes=10240, backupCount=10)
-    formatter = logging.Formatter(
-        '%(asctime)s %(levelname)s: %(message)s [in %(pathname)s:%(lineno)d]'
-    )
-    file_handler.setFormatter(formatter)
-    file_handler.setLevel(logging.INFO)
-    app.logger.addHandler(file_handler)
-    app.logger.setLevel(logging.INFO)
-
+    oauth.init_app(app)
+    
     # Configure login manager
     login_manager.login_view = 'auth.login'
     login_manager.login_message = 'Please log in to access this page.'
-    login_manager.login_message_category = 'info'
-
-    # Register Blueprints
+    
+    # Configure OAuth providers
+    configure_oauth(app)
+    
+    # Register blueprints
     from app.main import bp as main_bp
     app.register_blueprint(main_bp)
-
-    if config_name != 'testing':
-        from app.auth import bp as auth_bp
-        app.register_blueprint(auth_bp, url_prefix='/auth')
-
-    from app.api import bp as api_bp
-    app.register_blueprint(api_bp)
-
-
-    # Error handlers to return JSON responses
-    @app.errorhandler(HTTPException)
-    def handle_http_error(error):
-        response = jsonify({'error': error.description})
-        response.status_code = error.code or 500
-        return response
-
-    @app.errorhandler(Exception)
-    def handle_generic_error(error):
-        app.logger.exception(error)
-        response = jsonify({'error': 'Internal Server Error'})
-        response.status_code = 500
-        return response
-
-    # User loader for Flask-Login
+    
+    from app.auth import bp as auth_bp
+    app.register_blueprint(auth_bp, url_prefix='/auth')
+    
+    # User loader
     @login_manager.user_loader
     def load_user(user_id):
         from app.models.user import User
         return User.query.get(user_id)
-
-    app.logger.info('Application startup')
-
+    
     return app
+
+def configure_oauth(app):
+    """Configure OAuth providers"""
+    
+    # Google OAuth
+    if app.config.get('GOOGLE_CLIENT_ID'):
+        oauth.register(
+            name='google',
+            client_id=app.config.get('GOOGLE_CLIENT_ID'),
+            client_secret=app.config.get('GOOGLE_CLIENT_SECRET'),
+            server_metadata_url='https://accounts.google.com/.well-known/openid-configuration',
+            client_kwargs={'scope': 'openid email profile'}
+        )
+    
+    # GitHub OAuth
+    if app.config.get('GITHUB_CLIENT_ID'):
+        oauth.register(
+            name='github',
+            client_id=app.config.get('GITHUB_CLIENT_ID'),
+            client_secret=app.config.get('GITHUB_CLIENT_SECRET'),
+            access_token_url='https://github.com/login/oauth/access_token',
+            authorize_url='https://github.com/login/oauth/authorize',
+            api_base_url='https://api.github.com/',
+            client_kwargs={'scope': 'user:email'}
+        )
+    
+    # Azure OAuth
+    if app.config.get('AZURE_CLIENT_ID') and app.config.get('AZURE_TENANT_ID'):
+        oauth.register(
+            name='azure',
+            client_id=app.config.get('AZURE_CLIENT_ID'),
+            client_secret=app.config.get('AZURE_CLIENT_SECRET'),
+            server_metadata_url=f'https://login.microsoftonline.com/{app.config.get("AZURE_TENANT_ID")}/v2.0/.well-known/openid-configuration',
+            client_kwargs={'scope': 'openid email profile'}
+        )

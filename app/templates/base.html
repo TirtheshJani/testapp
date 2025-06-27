@@ -4,53 +4,41 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Sports Talent Agency{% endblock %}</title>
-    
-    <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    
-    {% block head %}{% endblock %}
+    <link href="{{ url_for('static', filename='css/main.css') }}" rel="stylesheet">
 </head>
 <body>
-    <!-- Navigation -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
         <div class="container">
-            <a class="navbar-brand" href="{{ url_for('main.index') }}">
-                <strong>Sports Talent Agency</strong>
-            </a>
+            <a class="navbar-brand" href="{{ url_for('main.index') }}">Sports Talent Agency</a>
             
             <div class="navbar-nav ms-auto">
                 {% if current_user.is_authenticated %}
-                <a class="nav-link" href="{{ url_for('main.dashboard') }}">Dashboard</a>
-                <a class="nav-link" href="{{ url_for('auth.logout') }}">Logout</a>
+                    <span class="navbar-text me-3">Hello, {{ current_user.full_name }}!</span>
+                    <a class="nav-link" href="{{ url_for('main.dashboard') }}">Dashboard</a>
+                    <a class="nav-link" href="{{ url_for('auth.logout') }}">Logout</a>
                 {% else %}
-                <a class="nav-link" href="{{ url_for('auth.login') }}">Login</a>
+                    <a class="nav-link" href="{{ url_for('auth.login') }}">Login</a>
                 {% endif %}
             </div>
         </div>
     </nav>
     
-    <!-- Flash Messages -->
-    <div class="container mt-3">
+    <main class="container mt-4">
         {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages %}
                 {% for category, message in messages %}
-                    <div class="alert alert-{{ 'danger' if category == 'error' else category }} alert-dismissible fade show" role="alert">
+                    <div class="alert alert-{{ 'danger' if category == 'error' else category }} alert-dismissible fade show">
                         {{ message }}
                         <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                     </div>
                 {% endfor %}
             {% endif %}
         {% endwith %}
-    </div>
-    
-    <!-- Main Content -->
-    <main class="container mt-4">
+        
         {% block content %}{% endblock %}
     </main>
     
-    <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    
-    {% block scripts %}{% endblock %}
 </body>
 </html>
