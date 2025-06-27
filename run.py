@@ -30,7 +30,6 @@ def make_shell_context():
         'AthleteProfile': AthleteProfile,
         'AthleteSkill': AthleteSkill,
         'AthleteStat': AthleteStat,
-        'AthleteSkill': AthleteSkill
     }
 
 @app.cli.command()
