@@ -193,3 +193,4 @@ cython_debug/
 .cursorignore
 .cursorindexingignore\n# Node modules\nnode_modules/
 frontend/dist/
+storage/
