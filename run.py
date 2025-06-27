@@ -1,8 +1,18 @@
 import os
 from app import create_app, db
-from app.models import User, Role, UserRole, UserOAuthAccount, Sport, Position
+from app.models import (
+    User,
+    Role,
+    UserRole,
+    UserOAuthAccount,
+    Sport,
+    Position,
+    AthleteProfile,
+    AthleteSkill,
+)
 from flask.cli import with_appcontext
 import click
+from datetime import date
 
 app = create_app(os.getenv('FLASK_ENV') or 'development')
 
@@ -15,7 +25,9 @@ def make_shell_context():
         'UserRole': UserRole,
         'UserOAuthAccount': UserOAuthAccount,
         'Sport': Sport,
-        'Position': Position
+        'Position': Position,
+        'AthleteProfile': AthleteProfile,
+        'AthleteSkill': AthleteSkill
     }
 
 @app.cli.command()
@@ -116,9 +128,37 @@ def init_db():
                     description=pos_data['description']
                 )
                 db.session.add(position)
-    
+
+    # Commit roles, sports and positions
     db.session.commit()
-    click.echo('Database initialized with default roles and sports.')
+
+    # Sample athlete with skills
+    if not User.query.filter_by(username='sampleathlete').first():
+        user = User(
+            username='sampleathlete',
+            email='sample@example.com',
+            first_name='Sample',
+            last_name='Athlete'
+        )
+        user.set_password('password')
+        db.session.add(user)
+        db.session.flush()
+
+        profile = AthleteProfile(
+            user_id=user.user_id,
+            date_of_birth=date(1990, 1, 1)
+        )
+        db.session.add(profile)
+        db.session.flush()
+
+        skills = [
+            AthleteSkill(athlete_id=profile.athlete_id, name='Speed', level=5),
+            AthleteSkill(athlete_id=profile.athlete_id, name='Agility', level=4),
+        ]
+        db.session.add_all(skills)
+
+    db.session.commit()
+    click.echo('Database initialized with default roles, sports and sample athlete.')
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5000)
