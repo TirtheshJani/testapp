@@ -8,9 +8,6 @@ class AthleteSkill(BaseModel):
     skill_id = db.Column(db.String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
     athlete_id = db.Column(db.String(36), db.ForeignKey('athlete_profiles.athlete_id', ondelete='CASCADE'), nullable=False)
     name = db.Column(db.String(100), nullable=False)
-    level = db.Column(db.String(50))
-
-    athlete = db.relationship('AthleteProfile', backref='skills')
     level = db.Column(db.Integer)
 
     athlete = db.relationship('AthleteProfile', back_populates='skills')
@@ -21,4 +18,3 @@ class AthleteSkill(BaseModel):
 
     def __repr__(self):
         return f'<AthleteSkill {self.name}>'
-        return f'<AthleteSkill {self.skill_id}>'
