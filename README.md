@@ -49,3 +49,16 @@ docker-compose up --build
 ```
 This starts the Flask server on port `5000` and a Postgres database on `5432`.
 
+
+## Supported browsers
+
+The React frontend is regularly tested on the latest versions of Chrome, Firefox, Safari and Edge. Other modern browsers that support ES2015+ features should also work.
+
+## Checking layout on mobile vs. desktop
+
+To verify the responsive design manually:
+1. Start the Flask backend with `flask run` and the frontend with `npm run dev`.
+2. Open the app in a browser and use developer tools to emulate devices.
+3. Test common viewport widths (e.g., 375px and 1280px) and ensure navigation and forms render correctly.
+
+For automated cross-browser or cross-device testing, you can integrate a service like BrowserStack or add Playwright and run `npx playwright test`.
