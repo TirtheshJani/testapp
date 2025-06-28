@@ -49,3 +49,9 @@ class User(UserMixin, db.Model):
     
     def __repr__(self):
         return f'<User {self.username}>'
+
+    def to_dict(self):
+        """Return a dictionary of user fields with full_name."""
+        data = {c.name: getattr(self, c.name) for c in self.__table__.columns}
+        data['full_name'] = self.full_name
+        return data

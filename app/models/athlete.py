@@ -75,3 +75,10 @@ class AthleteProfile(BaseModel):
     
     def __repr__(self):
         return f'<AthleteProfile {self.user.full_name}>'
+
+    def to_dict(self):
+        """Return a dict representation including related user."""
+        data = super().to_dict()
+        if self.user:
+            data['user'] = self.user.to_dict()
+        return data
