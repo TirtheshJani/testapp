@@ -36,8 +36,9 @@ The Vite dev server proxies API requests to `http://localhost:5000`, so run the 
 
 ## Running tests
 
-Install Python dependencies as above and run:
+Install Python dependencies as above and then install the test packages:
 ```bash
+pip install -r requirements-dev.txt
 pytest
 ```
 
