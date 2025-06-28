@@ -63,3 +63,11 @@ To verify the responsive design manually:
 3. Test common viewport widths (e.g., 375px and 1280px) and ensure navigation and forms render correctly.
 
 For automated cross-browser or cross-device testing, you can integrate a service like BrowserStack or add Playwright and run `npx playwright test`.
+
+## Documentation
+
+Additional technical documentation is available in the `docs/` directory:
+
+- `database_schema.md` – overview of the database tables and relationships
+- `api_endpoints.md` – list of API endpoints with parameters
+- `user_guide_athletes.md` – instructions for managing athlete profiles
