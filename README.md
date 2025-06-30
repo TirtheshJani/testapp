@@ -30,6 +30,11 @@ flask db upgrade
    flask run
    ```
 
+4. **Scheduled jobs** (optional)
+   Set `ENABLE_SCHEDULER=true` in your `.env` to start APScheduler with nightly
+   and weekly sync tasks when the Flask app launches. Game results are pulled
+   each night at 2 AM and player stats update every Sunday at 3 AM.
+
 ## Frontend setup (React)
 
 ```bash
