@@ -3,6 +3,7 @@ from typing import Optional
 
 import requests
 from flask import current_app
+from .http_utils import request_with_retry
 
 from app import db
 from app.models import NHLTeam, NHLGame, AthleteProfile, AthleteStat
@@ -19,10 +20,29 @@ class NHLAPIClient:
         self.session = requests.Session()
 
     def _get(self, endpoint: str, params: Optional[dict] = None):
+        """Perform GET with retry and handle errors."""
         url = f"{self.base_url}{endpoint}"
-        resp = self.session.get(url, params=params, timeout=10)
-        resp.raise_for_status()
-        return resp.json()
+        try:
+            resp = request_with_retry(
+                self.session,
+                "get",
+                url,
+                params=params,
+                timeout=10,
+                logger=logging.getLogger(__name__),
+            )
+            try:
+                return resp.json()
+            except ValueError as exc:
+                logging.getLogger(__name__).error(
+                    "Failed parsing JSON from %s: %s", url, exc
+                )
+                return {}
+        except Exception as exc:
+            logging.getLogger(__name__).error(
+                "NHL API request failed for %s: %s", url, exc
+            )
+            return {}
 
     def get_teams(self):
         data = self._get("/teams")

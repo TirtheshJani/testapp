@@ -3,6 +3,7 @@ from typing import Optional
 
 import requests
 from flask import current_app
+from .http_utils import request_with_retry
 
 from app import db
 from app.models import NBATeam, NBAGame, AthleteProfile, AthleteStat
@@ -20,10 +21,29 @@ class NBAAPIClient:
             self.session.headers.update({'Authorization': f'Bearer {self.token}'})
 
     def _get(self, endpoint: str, params: Optional[dict] = None):
+        """Perform GET with retry and handle errors gracefully."""
         url = f"{self.base_url}{endpoint}"
-        resp = self.session.get(url, params=params, timeout=10)
-        resp.raise_for_status()
-        return resp.json()
+        try:
+            resp = request_with_retry(
+                self.session,
+                "get",
+                url,
+                params=params,
+                timeout=10,
+                logger=logging.getLogger(__name__),
+            )
+            try:
+                return resp.json()
+            except ValueError as exc:
+                logging.getLogger(__name__).error(
+                    "Failed parsing JSON from %s: %s", url, exc
+                )
+                return {}
+        except Exception as exc:
+            logging.getLogger(__name__).error(
+                "NBA API request failed for %s: %s", url, exc
+            )
+            return {}
 
     def get_teams(self):
         return self._get('/teams').get('data', [])

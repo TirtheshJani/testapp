@@ -2,6 +2,7 @@ import os
 import sys
 from datetime import date
 from unittest.mock import patch
+import requests
 
 import pytest
 
@@ -74,3 +75,12 @@ def test_sync_games(app_ctx):
         games = nba_service.sync_games(client, team_id=1, season=2024)
     assert NBAGame.query.count() == 1
     assert games[0]['id'] == 10
+
+
+def test_get_handles_request_errors(monkeypatch):
+    client = nba_service.NBAAPIClient()
+    def fail(*args, **kwargs):
+        raise requests.RequestException("boom")
+    monkeypatch.setattr(nba_service, "request_with_retry", fail)
+    data = client._get("/bad")
+    assert data == {}
