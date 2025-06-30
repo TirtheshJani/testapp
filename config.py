@@ -18,6 +18,8 @@ class Config:
     AZURE_CLIENT_ID = os.environ.get('AZURE_CLIENT_ID')
     AZURE_CLIENT_SECRET = os.environ.get('AZURE_CLIENT_SECRET')
     AZURE_TENANT_ID = os.environ.get('AZURE_TENANT_ID')
+    NBA_API_BASE_URL = os.environ.get("NBA_API_BASE_URL") or "https://www.balldontlie.io/api/v1"
+    NBA_API_TOKEN = os.environ.get("NBA_API_TOKEN")
 
 class DevelopmentConfig(Config):
     DEBUG = True
