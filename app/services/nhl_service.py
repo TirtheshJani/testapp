@@ -1,5 +1,4 @@
 import logging
-from datetime import datetime
 from typing import Optional
 
 import requests
@@ -7,6 +6,7 @@ from flask import current_app
 
 from app import db
 from app.models import NHLTeam, NHLGame, AthleteProfile, AthleteStat
+from .data_mapping import map_nhl_team, map_nhl_game
 
 
 class NHLAPIClient:
@@ -58,14 +58,15 @@ def sync_teams(client: NHLAPIClient):
     """Fetch and store all NHL teams."""
     teams = client.get_teams()
     for t in teams:
-        team = NHLTeam.query.get(t["id"])
+        mapped = map_nhl_team(t)
+        team = NHLTeam.query.get(mapped["team_id"])
         if not team:
-            team = NHLTeam(team_id=t["id"])
-        team.name = t.get("name")
-        team.abbreviation = t.get("abbreviation")
-        team.location = t.get("locationName") or t.get("teamName")
-        team.division = (t.get("division") or {}).get("name")
-        team.conference = (t.get("conference") or {}).get("name")
+            team = NHLTeam(team_id=mapped["team_id"])
+        team.name = mapped["name"]
+        team.abbreviation = mapped["abbreviation"]
+        team.location = mapped["location"]
+        team.division = mapped["division"]
+        team.conference = mapped["conference"]
         db.session.add(team)
     db.session.commit()
     logging.getLogger(__name__).info("Synced %d NHL teams", len(teams))
@@ -96,16 +97,16 @@ def sync_games(client: NHLAPIClient, team_id: int, season: Optional[str] = None)
     """Fetch schedule for a team and store the games."""
     games = client.get_games(team_id=team_id, season=season)
     for g in games:
-        game_id = g["gamePk"]
-        game = NHLGame.query.get(game_id)
+        mapped = map_nhl_game(g)
+        game = NHLGame.query.get(mapped["game_id"])
         if not game:
-            game = NHLGame(game_id=game_id)
-        game.date = datetime.fromisoformat(g["gameDate"].rstrip("Z")).date()
-        game.season = g.get("season")
-        game.home_team_id = g["teams"]["home"]["team"]["id"]
-        game.visitor_team_id = g["teams"]["away"]["team"]["id"]
-        game.home_team_score = g["teams"]["home"].get("score")
-        game.visitor_team_score = g["teams"]["away"].get("score")
+            game = NHLGame(game_id=mapped["game_id"])
+        game.date = mapped["date"]
+        game.season = mapped["season"]
+        game.home_team_id = mapped["home_team_id"]
+        game.visitor_team_id = mapped["visitor_team_id"]
+        game.home_team_score = mapped["home_team_score"]
+        game.visitor_team_score = mapped["visitor_team_score"]
         db.session.add(game)
     db.session.commit()
     logging.getLogger(__name__).info(

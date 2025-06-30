@@ -6,6 +6,7 @@ from flask import current_app
 
 from app import db
 from app.models import MLBTeam, AthleteProfile, AthleteStat
+from .data_mapping import map_mlb_team
 
 
 class MLBAPIClient:
@@ -43,14 +44,15 @@ def sync_teams(client: MLBAPIClient):
     """Fetch and store all MLB teams."""
     teams = client.get_teams()
     for t in teams:
-        team = MLBTeam.query.get(t["id"])
+        mapped = map_mlb_team(t)
+        team = MLBTeam.query.get(mapped["team_id"])
         if not team:
-            team = MLBTeam(team_id=t["id"])
-        team.name = t.get("name")
-        team.abbreviation = t.get("abbreviation")
-        team.location = t.get("locationName") or t.get("city")
-        team.league = (t.get("league") or {}).get("name")
-        team.division = (t.get("division") or {}).get("name")
+            team = MLBTeam(team_id=mapped["team_id"])
+        team.name = mapped["name"]
+        team.abbreviation = mapped["abbreviation"]
+        team.location = mapped["location"]
+        team.league = mapped["league"]
+        team.division = mapped["division"]
         db.session.add(team)
     db.session.commit()
     logging.getLogger(__name__).info("Synced %d MLB teams", len(teams))

@@ -1,5 +1,4 @@
 import logging
-from datetime import datetime
 from typing import Optional
 
 import requests
@@ -7,6 +6,7 @@ from flask import current_app
 
 from app import db
 from app.models import NBATeam, NBAGame, AthleteProfile, AthleteStat
+from .data_mapping import map_nba_team, map_nba_game
 
 
 class NBAAPIClient:
@@ -48,15 +48,16 @@ def sync_teams(client: NBAAPIClient):
     """Fetch and store all NBA teams."""
     teams = client.get_teams()
     for t in teams:
-        team = NBATeam.query.get(t['id'])
+        mapped = map_nba_team(t)
+        team = NBATeam.query.get(mapped['team_id'])
         if not team:
-            team = NBATeam(team_id=t['id'])
-        team.abbreviation = t.get('abbreviation')
-        team.city = t.get('city')
-        team.conference = t.get('conference')
-        team.division = t.get('division')
-        team.full_name = t.get('full_name')
-        team.name = t.get('name')
+            team = NBATeam(team_id=mapped['team_id'])
+        team.abbreviation = mapped['abbreviation']
+        team.city = mapped['city']
+        team.conference = mapped['conference']
+        team.division = mapped['division']
+        team.full_name = mapped['full_name']
+        team.name = mapped['name']
         db.session.add(team)
     db.session.commit()
     logging.getLogger(__name__).info("Synced %d NBA teams", len(teams))
@@ -67,15 +68,16 @@ def sync_games(client: NBAAPIClient, team_id: int, season: Optional[int] = None)
     """Fetch game logs for a team and store them."""
     games = client.get_games(team_id=team_id, season=season)
     for g in games:
-        game = NBAGame.query.get(g['id'])
+        mapped = map_nba_game(g)
+        game = NBAGame.query.get(mapped['game_id'])
         if not game:
-            game = NBAGame(game_id=g['id'])
-        game.date = datetime.fromisoformat(g['date'].rstrip('Z')).date()
-        game.season = g.get('season')
-        game.home_team_id = g['home_team']['id']
-        game.visitor_team_id = g['visitor_team']['id']
-        game.home_team_score = g.get('home_team_score')
-        game.visitor_team_score = g.get('visitor_team_score')
+            game = NBAGame(game_id=mapped['game_id'])
+        game.date = mapped['date']
+        game.season = mapped['season']
+        game.home_team_id = mapped['home_team_id']
+        game.visitor_team_id = mapped['visitor_team_id']
+        game.home_team_score = mapped['home_team_score']
+        game.visitor_team_score = mapped['visitor_team_score']
         db.session.add(game)
     db.session.commit()
     logging.getLogger(__name__).info("Synced %d games for team %s", len(games), team_id)
