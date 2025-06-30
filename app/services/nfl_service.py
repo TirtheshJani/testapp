@@ -6,6 +6,7 @@ from flask import current_app
 
 from app import db
 from app.models import NFLTeam, AthleteProfile, AthleteStat
+from .data_mapping import map_nfl_team
 
 
 class NFLAPIClient:
@@ -41,14 +42,15 @@ def sync_teams(client: NFLAPIClient):
     """Fetch and store all NFL teams."""
     teams = client.get_teams()
     for t in teams:
-        team = NFLTeam.query.get(t["id"])
+        mapped = map_nfl_team(t)
+        team = NFLTeam.query.get(mapped["team_id"])
         if not team:
-            team = NFLTeam(team_id=t["id"])
-        team.name = t.get("name")
-        team.abbreviation = t.get("abbreviation")
-        team.city = t.get("city")
-        team.conference = t.get("conference")
-        team.division = t.get("division")
+            team = NFLTeam(team_id=mapped["team_id"])
+        team.name = mapped["name"]
+        team.abbreviation = mapped["abbreviation"]
+        team.city = mapped["city"]
+        team.conference = mapped["conference"]
+        team.division = mapped["division"]
         db.session.add(team)
     db.session.commit()
     logging.getLogger(__name__).info("Synced %d NFL teams", len(teams))
