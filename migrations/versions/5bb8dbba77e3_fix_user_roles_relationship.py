@@ -1,7 +1,7 @@
 """Fix user roles relationship
 
 Revision ID: 5bb8dbba77e3
-Revises: 
+Revises: None
 Create Date: 2025-06-16 15:38:46.088450
 
 """
