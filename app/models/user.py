@@ -23,6 +23,12 @@ class User(UserMixin, db.Model):
     # Relationships
     roles = db.relationship('Role', secondary='user_roles', back_populates='users')
     oauth_accounts = db.relationship('UserOAuthAccount', back_populates='user', cascade='all, delete-orphan')
+    athlete_profile = db.relationship(
+        'AthleteProfile',
+        back_populates='user',
+        uselist=False,
+        cascade='all, delete-orphan'
+    )
     
     def get_id(self):
         """Required by Flask-Login"""
