@@ -3,10 +3,19 @@ from app.utils.validators import validate_json, validate_params
 from app.utils.auth import login_or_token_required
 from flask_restx import Resource
 import logging
+from sqlalchemy import or_
 
 from app.api import api, bp
 from app import db
-from app.models import AthleteProfile, AthleteMedia, AthleteStat
+from app.models import (
+    AthleteProfile,
+    AthleteMedia,
+    AthleteStat,
+    NBATeam,
+    NBAGame,
+    NHLTeam,
+    NHLGame,
+)
 from app.services.media_service import MediaService
 from app.services.athlete_service import (
     create_athlete as create_athlete_service,
@@ -201,6 +210,75 @@ class AthleteStats(Resource):
         db.session.commit()
         logging.getLogger(__name__).info("Updated stat %s for athlete %s", name, athlete_id)
         return jsonify(stat.to_dict())
+
+
+@api.route('/athletes/<string:athlete_id>/stats/summary')
+@api.param('athlete_id', 'Athlete identifier')
+class AthleteStatsSummary(Resource):
+    """Return stats grouped by season for an athlete."""
+
+    @api.doc(description="Get aggregated stats for an athlete")
+    def get(self, athlete_id):
+        AthleteProfile.query.filter_by(athlete_id=athlete_id, is_deleted=False).first_or_404()
+        stats = AthleteStat.query.filter_by(athlete_id=athlete_id).all()
+        summary = {}
+        for s in stats:
+            season = s.season or 'career'
+            summary.setdefault(season, {})[s.name] = s.value
+        return jsonify(summary)
+
+
+@api.route('/athletes/<string:athlete_id>/game-log')
+@api.param('athlete_id', 'Athlete identifier')
+class AthleteGameLog(Resource):
+    """Return recent games for the athlete's current team."""
+
+    @api.doc(description="Get recent game log for an athlete")
+    def get(self, athlete_id):
+        athlete = (
+            AthleteProfile.query.filter_by(athlete_id=athlete_id, is_deleted=False)
+            .first_or_404()
+        )
+
+        if not athlete.current_team or not athlete.primary_sport:
+            return jsonify([])
+
+        code = athlete.primary_sport.code
+        games = []
+        if code == 'NBA':
+            team = NBATeam.query.filter(
+                (NBATeam.name.ilike(athlete.current_team))
+                | (NBATeam.full_name.ilike(athlete.current_team))
+                | (NBATeam.abbreviation.ilike(athlete.current_team))
+            ).first()
+            if team:
+                games = (
+                    NBAGame.query.filter(
+                        (NBAGame.home_team_id == team.team_id)
+                        | (NBAGame.visitor_team_id == team.team_id)
+                    )
+                    .order_by(NBAGame.date.desc())
+                    .limit(5)
+                    .all()
+                )
+        elif code == 'NHL':
+            team = NHLTeam.query.filter(
+                (NHLTeam.name.ilike(athlete.current_team))
+                | (NHLTeam.location.ilike(athlete.current_team))
+                | (NHLTeam.abbreviation.ilike(athlete.current_team))
+            ).first()
+            if team:
+                games = (
+                    NHLGame.query.filter(
+                        (NHLGame.home_team_id == team.team_id)
+                        | (NHLGame.visitor_team_id == team.team_id)
+                    )
+                    .order_by(NHLGame.date.desc())
+                    .limit(5)
+                    .all()
+                )
+
+        return jsonify([g.to_dict() for g in games])
 
 
 @api.route('/stats/<string:stat_id>')
