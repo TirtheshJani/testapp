@@ -20,6 +20,7 @@ class Config:
     AZURE_TENANT_ID = os.environ.get('AZURE_TENANT_ID')
     NBA_API_BASE_URL = os.environ.get("NBA_API_BASE_URL") or "https://www.balldontlie.io/api/v1"
     NBA_API_TOKEN = os.environ.get("NBA_API_TOKEN")
+    NFL_API_BASE_URL = os.environ.get("NFL_API_BASE_URL") or "https://api.nfl.com/v1"
 
 class DevelopmentConfig(Config):
     DEBUG = True

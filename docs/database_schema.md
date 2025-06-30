@@ -37,3 +37,8 @@ Additional tables for MLB integration:
 ```
 mlb_teams (team_id PK)
 ```
+
+Additional tables for NFL integration:
+```
+nfl_teams (team_id PK)
+```
