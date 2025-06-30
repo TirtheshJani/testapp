@@ -16,6 +16,8 @@ This repository contains a Flask API backend and a React frontend used to manage
    - `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET`
    - `GITHUB_CLIENT_ID` and `GITHUB_CLIENT_SECRET`
    - `AZURE_CLIENT_ID`, `AZURE_CLIENT_SECRET` and `AZURE_TENANT_ID`
+   - `NBA_API_TOKEN` optional access token for NBA stats API
+   - `NBA_API_BASE_URL` override base URL for NBA API (optional)
 ### Initialize the database
 Run database migrations to create all tables:
 

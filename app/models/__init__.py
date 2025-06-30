@@ -14,3 +14,7 @@ __all__ = [
     'AthleteSkill',
 ]
 
+from .team import NBATeam
+from .game import NBAGame
+
+__all__.extend(['NBATeam', 'NBAGame'])

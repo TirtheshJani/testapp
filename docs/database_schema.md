@@ -25,3 +25,10 @@ athlete_profiles
 ```
 
 Each `AthleteProfile` record is associated with exactly one `User`. Media, stats and skills reference the athlete profile via foreign keys. Sports have many positions, and each athlete is linked to a sport and position.
+
+Additional tables for NBA integration:
+
+```
+nba_teams (team_id PK)
+  |--< nba_games (game_id PK, home_team_id FK -> nba_teams.team_id, visitor_team_id FK -> nba_teams.team_id)
+```
