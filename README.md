@@ -16,11 +16,14 @@ This repository contains a Flask API backend and a React frontend used to manage
    - `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET`
    - `GITHUB_CLIENT_ID` and `GITHUB_CLIENT_SECRET`
    - `AZURE_CLIENT_ID`, `AZURE_CLIENT_SECRET` and `AZURE_TENANT_ID`
-3. **Database migrations**
-   ```bash
-   flask db upgrade
-   ```
-4. **Run the server**
+### Initialize the database
+Run database migrations to create all tables:
+
+```bash
+flask db upgrade
+```
+
+3. **Run the server**
    ```bash
    flask run
    ```
