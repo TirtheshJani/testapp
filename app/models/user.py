@@ -55,3 +55,15 @@ class User(UserMixin, db.Model):
         data = {c.name: getattr(self, c.name) for c in self.__table__.columns}
         data['full_name'] = self.full_name
         return data
+
+    def save(self):
+        """Persist the user to the database."""
+        db.session.add(self)
+        db.session.commit()
+        return self
+
+    def delete(self):
+        """Remove the user from the database."""
+        db.session.delete(self)
+        db.session.commit()
+        return True
