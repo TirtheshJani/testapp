@@ -3,7 +3,9 @@ from typing import Optional
 
 import requests
 from flask import current_app
+from cachelib import SimpleCache
 from .http_utils import request_with_retry
+from .rate_limit import RateLimiter
 
 from app import db
 from app.models import NFLTeam, AthleteProfile, AthleteStat
@@ -13,11 +15,18 @@ from .data_mapping import map_nfl_team
 class NFLAPIClient:
     """Client for a public NFL stats API."""
 
-    def __init__(self, base_url: Optional[str] = None):
+    def __init__(
+        self,
+        base_url: Optional[str] = None,
+        rate_limit_interval: float = 1.0,
+        cache_timeout: int = 3600,
+    ):
         self.base_url = base_url or current_app.config.get(
             "NFL_API_BASE_URL", "https://api.nfl.com/v1"
         )
         self.session = requests.Session()
+        self.rate_limiter = RateLimiter(rate_limit_interval)
+        self.cache = SimpleCache(default_timeout=cache_timeout)
 
     def _get(self, endpoint: str, params: Optional[dict] = None):
         """Perform GET with retry and handle errors."""
@@ -30,6 +39,7 @@ class NFLAPIClient:
                 params=params,
                 timeout=10,
                 logger=logging.getLogger(__name__),
+                rate_limiter=self.rate_limiter,
             )
             try:
                 return resp.json()
@@ -45,8 +55,13 @@ class NFLAPIClient:
             return {}
 
     def get_teams(self):
+        cached = self.cache.get("teams")
+        if cached is not None:
+            return cached
         data = self._get("/teams")
-        return data.get("teams", [])
+        teams = data.get("teams", [])
+        self.cache.set("teams", teams)
+        return teams
 
     def get_player_stats(
         self, player_id: int, season: Optional[int] = None, group: str = "offense"

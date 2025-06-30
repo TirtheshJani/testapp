@@ -3,7 +3,9 @@ from typing import Optional
 
 import requests
 from flask import current_app
+from cachelib import SimpleCache
 from .http_utils import request_with_retry
+from .rate_limit import RateLimiter
 
 from app import db
 from app.models import NHLTeam, NHLGame, AthleteProfile, AthleteStat
@@ -13,11 +15,18 @@ from .data_mapping import map_nhl_team, map_nhl_game
 class NHLAPIClient:
     """Client for the public NHL stats API."""
 
-    def __init__(self, base_url: Optional[str] = None):
+    def __init__(
+        self,
+        base_url: Optional[str] = None,
+        rate_limit_interval: float = 1.0,
+        cache_timeout: int = 3600,
+    ):
         self.base_url = base_url or current_app.config.get(
             "NHL_API_BASE_URL", "https://statsapi.web.nhl.com/api/v1"
         )
         self.session = requests.Session()
+        self.rate_limiter = RateLimiter(rate_limit_interval)
+        self.cache = SimpleCache(default_timeout=cache_timeout)
 
     def _get(self, endpoint: str, params: Optional[dict] = None):
         """Perform GET with retry and handle errors."""
@@ -30,6 +39,7 @@ class NHLAPIClient:
                 params=params,
                 timeout=10,
                 logger=logging.getLogger(__name__),
+                rate_limiter=self.rate_limiter,
             )
             try:
                 return resp.json()
@@ -45,21 +55,36 @@ class NHLAPIClient:
             return {}
 
     def get_teams(self):
+        cached = self.cache.get("teams")
+        if cached is not None:
+            return cached
         data = self._get("/teams")
-        return data.get("teams", [])
+        teams = data.get("teams", [])
+        self.cache.set("teams", teams)
+        return teams
 
     def get_standings(self):
+        cached = self.cache.get("standings")
+        if cached is not None:
+            return cached
         data = self._get("/standings")
-        return data.get("records", [])
+        records = data.get("records", [])
+        self.cache.set("standings", records)
+        return records
 
     def get_games(self, team_id: int, season: Optional[str] = None):
         params = {"teamId": team_id}
         if season:
             params["season"] = season
+        key = f"games:{team_id}:{season}"
+        cached = self.cache.get(key)
+        if cached is not None:
+            return cached
         data = self._get("/schedule", params=params)
         games = []
         for d in data.get("dates", []):
             games.extend(d.get("games", []))
+        self.cache.set(key, games)
         return games
 
     def get_player_stats(self, player_id: int, season: Optional[str] = None):
