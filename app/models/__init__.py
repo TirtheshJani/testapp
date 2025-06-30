@@ -18,3 +18,7 @@ from .team import NBATeam, MLBTeam, NFLTeam, NHLTeam
 from .game import NBAGame, NHLGame
 
 __all__.extend(['NBATeam', 'NBAGame', 'MLBTeam', 'NFLTeam', 'NHLTeam', 'NHLGame'])
+
+from .sync_log import SyncLog
+
+__all__.append('SyncLog')
