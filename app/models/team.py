@@ -45,3 +45,24 @@ class NFLTeam(BaseModel):
 
     def __repr__(self):
         return f'<NFLTeam {self.name}>'
+
+
+class NHLTeam(BaseModel):
+    __tablename__ = 'nhl_teams'
+
+    team_id = db.Column(db.Integer, primary_key=True)
+    abbreviation = db.Column(db.String(10))
+    name = db.Column(db.String(100))
+    location = db.Column(db.String(50))
+    conference = db.Column(db.String(50))
+    division = db.Column(db.String(50))
+    wins = db.Column(db.Integer)
+    losses = db.Column(db.Integer)
+    overtime_losses = db.Column(db.Integer)
+    points = db.Column(db.Integer)
+
+    games_home = db.relationship('NHLGame', back_populates='home_team', foreign_keys='NHLGame.home_team_id')
+    games_away = db.relationship('NHLGame', back_populates='visitor_team', foreign_keys='NHLGame.visitor_team_id')
+
+    def __repr__(self):
+        return f'<NHLTeam {self.name}>'
