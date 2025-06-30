@@ -31,3 +31,17 @@ class MLBTeam(BaseModel):
 
     def __repr__(self):
         return f'<MLBTeam {self.name}>'
+
+
+class NFLTeam(BaseModel):
+    __tablename__ = 'nfl_teams'
+
+    team_id = db.Column(db.Integer, primary_key=True)
+    abbreviation = db.Column(db.String(10))
+    city = db.Column(db.String(50))
+    conference = db.Column(db.String(50))
+    division = db.Column(db.String(50))
+    name = db.Column(db.String(100))
+
+    def __repr__(self):
+        return f'<NFLTeam {self.name}>'
