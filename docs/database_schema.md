@@ -32,3 +32,8 @@ Additional tables for NBA integration:
 nba_teams (team_id PK)
   |--< nba_games (game_id PK, home_team_id FK -> nba_teams.team_id, visitor_team_id FK -> nba_teams.team_id)
 ```
+
+Additional tables for MLB integration:
+```
+mlb_teams (team_id PK)
+```
