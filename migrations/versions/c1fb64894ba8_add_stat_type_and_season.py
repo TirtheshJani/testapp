@@ -1,7 +1,7 @@
 """add stat_type and season to athlete_stats
 
 Revision ID: c1fb64894ba8
-Revises: 5bb8dbba77e3
+Revises: 915b1c8b9adb
 Create Date: 2025-07-01 00:00:00.000000
 """
 from alembic import op
