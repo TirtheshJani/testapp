@@ -14,7 +14,7 @@ __all__ = [
     'AthleteSkill',
 ]
 
-from .team import NBATeam
+from .team import NBATeam, MLBTeam
 from .game import NBAGame
 
-__all__.extend(['NBATeam', 'NBAGame'])
+__all__.extend(['NBATeam', 'NBAGame', 'MLBTeam'])
