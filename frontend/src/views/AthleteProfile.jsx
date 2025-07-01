@@ -2,6 +2,7 @@ import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import SkillEditor from '../components/SkillEditor';
 import StatEditor from '../components/StatEditor';
+import StatChart from '../components/StatChart';
 
 export default function AthleteProfile() {
   const { id } = useParams();
@@ -43,6 +44,7 @@ export default function AthleteProfile() {
       </div>
       <SkillEditor athleteId={id} />
       <StatEditor athleteId={id} />
+      <StatChart athleteId={id} />
     </div>
     </div>
   );
