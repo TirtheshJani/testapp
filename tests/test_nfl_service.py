@@ -2,6 +2,7 @@ import os
 import sys
 from datetime import date
 from unittest.mock import patch
+import requests
 
 import pytest
 
@@ -65,3 +66,26 @@ def test_sync_player_stats(app_ctx):
     stats = {s.name: s for s in athlete.stats}
     assert stats['PassingYards'].value == '4000'
     assert stats['Tackles'].value == '80'
+
+
+def test_get_handles_request_errors(monkeypatch):
+    client = nfl_service.NFLAPIClient()
+
+    def fail(*args, **kwargs):
+        raise requests.RequestException("boom")
+
+    monkeypatch.setattr(nfl_service, "request_with_retry", fail)
+    data = client._get("/bad")
+    assert data == {}
+
+
+def test_get_handles_bad_json(monkeypatch):
+    client = nfl_service.NFLAPIClient()
+
+    class BadResp:
+        def json(self):
+            raise ValueError("bad")
+
+    monkeypatch.setattr(nfl_service, "request_with_retry", lambda *a, **k: BadResp())
+    data = client._get("/bad-json")
+    assert data == {}
