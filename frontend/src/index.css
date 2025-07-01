@@ -33,11 +33,6 @@ body {
 
 .profile-container h2 {
   margin-top: 0;
-=======
-.container {
-  max-width: 800px;
-  margin: 0 auto;
-  padding: 1rem;
 }
 
 .form-row {
@@ -79,4 +74,9 @@ body {
   justify-content: space-between;
   margin-bottom: 0.5rem;
 
+}
+
+.stat-chart {
+  max-width: 600px;
+  margin-top: 1rem;
 }
