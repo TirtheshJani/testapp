@@ -84,3 +84,17 @@ def test_get_handles_request_errors(monkeypatch):
     monkeypatch.setattr(nba_service, "request_with_retry", fail)
     data = client._get("/bad")
     assert data == {}
+
+def test_get_handles_bad_json(monkeypatch):
+    client = nba_service.NBAAPIClient()
+
+    class BadResp:
+        def json(self):
+            raise ValueError("bad")
+
+    def fake(*args, **kwargs):
+        return BadResp()
+
+    monkeypatch.setattr(nba_service, "request_with_retry", fake)
+    data = client._get("/bad-json")
+    assert data == {}

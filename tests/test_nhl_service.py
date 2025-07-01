@@ -2,6 +2,7 @@ import os
 import sys
 from datetime import date
 from unittest.mock import patch
+import requests
 
 import pytest
 
@@ -119,3 +120,26 @@ def test_sync_player_stats(app_ctx):
     assert stored['Assists'].value == '40'
     assert stored['Points'].value == '70'
 
+
+
+def test_get_handles_request_errors(monkeypatch):
+    client = nhl_service.NHLAPIClient()
+
+    def fail(*args, **kwargs):
+        raise requests.RequestException("boom")
+
+    monkeypatch.setattr(nhl_service, "request_with_retry", fail)
+    data = client._get("/bad")
+    assert data == {}
+
+
+def test_get_handles_bad_json(monkeypatch):
+    client = nhl_service.NHLAPIClient()
+
+    class BadResp:
+        def json(self):
+            raise ValueError("bad")
+
+    monkeypatch.setattr(nhl_service, "request_with_retry", lambda *a, **k: BadResp())
+    data = client._get("/bad-json")
+    assert data == {}

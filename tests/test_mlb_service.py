@@ -2,6 +2,7 @@ import os
 import sys
 from datetime import date
 from unittest.mock import patch
+import requests
 
 import pytest
 
@@ -67,3 +68,26 @@ def test_sync_player_stats(app_ctx):
     assert stats['BattingAverage'].value == '.300'
     assert stats['EarnedRunAverage'].value == '3.20'
     assert stats['FieldingPercentage'].value == '0.990'
+
+
+def test_get_handles_request_errors(monkeypatch):
+    client = mlb_service.MLBAPIClient()
+
+    def fail(*args, **kwargs):
+        raise requests.RequestException("boom")
+
+    monkeypatch.setattr(mlb_service, "request_with_retry", fail)
+    data = client._get("/bad")
+    assert data == {}
+
+
+def test_get_handles_bad_json(monkeypatch):
+    client = mlb_service.MLBAPIClient()
+
+    class BadResp:
+        def json(self):
+            raise ValueError("bad")
+
+    monkeypatch.setattr(mlb_service, "request_with_retry", lambda *a, **k: BadResp())
+    data = client._get("/bad-json")
+    assert data == {}
