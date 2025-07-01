@@ -4,6 +4,7 @@ import SkillEditor from '../components/SkillEditor';
 import StatEditor from '../components/StatEditor';
 import StatChart from '../components/StatChart';
 import SeasonStats from '../components/SeasonStats';
+import GameLog from '../components/GameLog';
 
 export default function AthleteProfile() {
   const { id } = useParams();
@@ -46,6 +47,7 @@ export default function AthleteProfile() {
       <SkillEditor athleteId={id} />
       <StatEditor athleteId={id} />
       <SeasonStats athleteId={id} />
+      <GameLog athleteId={id} />
       <StatChart athleteId={id} />
     </div>
     </div>
