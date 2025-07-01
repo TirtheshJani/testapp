@@ -231,7 +231,7 @@ class AthleteStatsSummary(Resource):
 @api.route('/athletes/<string:athlete_id>/game-log')
 @api.param('athlete_id', 'Athlete identifier')
 class AthleteGameLog(Resource):
-    """Return recent games for the athlete's current team."""
+    """Return games for the athlete's current team with optional pagination."""
 
     @api.doc(description="Get recent game log for an athlete")
     def get(self, athlete_id):
@@ -244,41 +244,75 @@ class AthleteGameLog(Resource):
             return jsonify([])
 
         code = athlete.primary_sport.code
-        games = []
-        if code == 'NBA':
+        season = request.args.get("season")
+        page = request.args.get("page", type=int)
+        per_page = request.args.get("per_page", type=int)
+
+        games_q = None
+        team = None
+        if code == "NBA":
             team = NBATeam.query.filter(
                 (NBATeam.name.ilike(athlete.current_team))
                 | (NBATeam.full_name.ilike(athlete.current_team))
                 | (NBATeam.abbreviation.ilike(athlete.current_team))
             ).first()
             if team:
-                games = (
-                    NBAGame.query.filter(
-                        (NBAGame.home_team_id == team.team_id)
-                        | (NBAGame.visitor_team_id == team.team_id)
-                    )
-                    .order_by(NBAGame.date.desc())
-                    .limit(5)
-                    .all()
+                games_q = NBAGame.query.filter(
+                    (NBAGame.home_team_id == team.team_id)
+                    | (NBAGame.visitor_team_id == team.team_id)
                 )
-        elif code == 'NHL':
+                if season:
+                    games_q = games_q.filter(NBAGame.season == int(season))
+                games_q = games_q.order_by(NBAGame.date.desc())
+        elif code == "NHL":
             team = NHLTeam.query.filter(
                 (NHLTeam.name.ilike(athlete.current_team))
                 | (NHLTeam.location.ilike(athlete.current_team))
                 | (NHLTeam.abbreviation.ilike(athlete.current_team))
             ).first()
             if team:
-                games = (
-                    NHLGame.query.filter(
-                        (NHLGame.home_team_id == team.team_id)
-                        | (NHLGame.visitor_team_id == team.team_id)
-                    )
-                    .order_by(NHLGame.date.desc())
-                    .limit(5)
-                    .all()
+                games_q = NHLGame.query.filter(
+                    (NHLGame.home_team_id == team.team_id)
+                    | (NHLGame.visitor_team_id == team.team_id)
                 )
+                if season:
+                    games_q = games_q.filter(NHLGame.season == season)
+                games_q = games_q.order_by(NHLGame.date.desc())
 
-        return jsonify([g.to_dict() for g in games])
+        if games_q is None:
+            return jsonify([])
+
+        if page and per_page:
+            pagination = games_q.paginate(page=page, per_page=per_page, error_out=False)
+            games = pagination.items
+            total = pagination.total
+        else:
+            limit = per_page or 5
+            games = games_q.limit(limit).all()
+            total = len(games)
+
+        result = []
+        for g in games:
+            data = g.to_dict()
+            if hasattr(g, "home_team") and g.home_team:
+                data["home_team_name"] = g.home_team.full_name or g.home_team.name
+            if hasattr(g, "visitor_team") and g.visitor_team:
+                data["visitor_team_name"] = (
+                    g.visitor_team.full_name or g.visitor_team.name
+                )
+            if team:
+                data["is_home"] = g.home_team_id == team.team_id
+                if g.home_team_id == team.team_id:
+                    data["opponent_name"] = (
+                        g.visitor_team.full_name or g.visitor_team.name
+                    )
+                else:
+                    data["opponent_name"] = g.home_team.full_name or g.home_team.name
+            result.append(data)
+
+        if page and per_page:
+            return jsonify({"items": result, "total": total})
+        return jsonify(result)
 
 
 @api.route('/stats/<string:stat_id>')
