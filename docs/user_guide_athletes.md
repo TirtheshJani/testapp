@@ -56,7 +56,7 @@ POST /api/athletes/<athlete_id>/stats
 
 ## Searching Profiles
 
-Use `GET /api/athletes/search` with query parameters such as `q`, `sport`, `position` or `team` to find athletes.
+Use `GET /api/athletes` with a `q` parameter to perform a basic search over athlete names, positions or team names. Advanced filtering remains available via `GET /api/athletes/search`.
 
 ## Deleting a Profile
 
