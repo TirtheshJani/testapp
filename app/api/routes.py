@@ -15,6 +15,8 @@ from app.models import (
     NBAGame,
     NHLTeam,
     NHLGame,
+    User,
+    Position,
 )
 from app.services.media_service import MediaService
 from app.services.athlete_service import (
@@ -33,13 +35,42 @@ class AthleteList(Resource):
 
     @api.doc(description="List athletes", params={
         'page': 'Page number',
-        'per_page': 'Items per page'
+        'per_page': 'Items per page',
+        'q': 'Search term',
+        'position': 'Filter by position name',
+        'team': 'Filter by team name'
     })
     def get(self):
         page = request.args.get('page', 1, type=int)
         per_page = request.args.get('per_page', 10, type=int)
-        q = AthleteProfile.query.filter_by(is_deleted=False)
-        pagination = q.paginate(page=page, per_page=per_page, error_out=False)
+        search = request.args.get('q', '')
+        position = request.args.get('position')
+        team = request.args.get('team')
+
+        query = (
+            AthleteProfile.query.filter_by(is_deleted=False)
+            .join(User)
+            .outerjoin(Position)
+        )
+
+        if search:
+            pattern = f"%{search}%"
+            query = query.filter(
+                or_(
+                    User.first_name.ilike(pattern),
+                    User.last_name.ilike(pattern),
+                    Position.name.ilike(pattern),
+                    AthleteProfile.current_team.ilike(pattern),
+                )
+            )
+
+        if position:
+            query = query.filter(Position.name.ilike(f"%{position}%"))
+
+        if team:
+            query = query.filter(AthleteProfile.current_team.ilike(f"%{team}%"))
+
+        pagination = query.paginate(page=page, per_page=per_page, error_out=False)
         data = [a.to_dict() for a in pagination.items]
         return jsonify({'items': data, 'total': pagination.total})
 
