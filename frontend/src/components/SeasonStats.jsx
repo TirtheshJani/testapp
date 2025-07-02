@@ -2,15 +2,30 @@ import { useEffect, useState } from 'react';
 
 export default function SeasonStats({ athleteId }) {
   const [summary, setSummary] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     if (!athleteId) return;
+    setLoading(true);
+    setError(null);
     fetch(`/api/athletes/${athleteId}/stats/summary`)
-      .then((res) => res.json())
-      .then(setSummary)
-      .catch((err) => console.error('Failed to load stat summary', err));
+      .then((res) => {
+        if (!res.ok) throw new Error('Failed to load');
+        return res.json();
+      })
+      .then((data) => {
+        setSummary(data);
+      })
+      .catch((err) => {
+        console.error('Failed to load stat summary', err);
+        setError('Failed to load stats');
+      })
+      .finally(() => setLoading(false));
   }, [athleteId]);
 
+  if (loading) return <div>Loading...</div>;
+  if (error) return <div style={{ color: 'red' }}>{error}</div>;
   if (!summary) return null;
 
   const seasons = Object.keys(summary).sort();

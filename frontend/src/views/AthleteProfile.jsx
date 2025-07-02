@@ -11,12 +11,23 @@ export default function AthleteProfile() {
   const navigate = useNavigate();
   const [athlete, setAthlete] = useState(null);
   const [statsTab, setStatsTab] = useState('summary');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
+    setLoading(true);
+    setError(null);
     fetch(`/api/athletes/${id}`)
-      .then((res) => res.json())
+      .then((res) => {
+        if (!res.ok) throw new Error('Failed to load');
+        return res.json();
+      })
       .then((data) => setAthlete(data))
-      .catch((err) => console.error('Failed to fetch athlete', err));
+      .catch((err) => {
+        console.error('Failed to fetch athlete', err);
+        setError('Failed to load athlete');
+      })
+      .finally(() => setLoading(false));
   }, [id]);
 
   const handleDelete = () => {
@@ -28,6 +39,8 @@ export default function AthleteProfile() {
       .catch((err) => console.error('Failed to delete athlete', err));
   };
 
+  if (loading) return <div>Loading...</div>;
+  if (error) return <div style={{ color: 'red' }}>{error}</div>;
   if (!athlete) {
     return <div>Loading...</div>;
   }

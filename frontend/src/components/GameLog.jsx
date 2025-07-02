@@ -7,12 +7,19 @@ export default function GameLog({ athleteId }) {
   const [page, setPage] = useState(1);
   const [total, setTotal] = useState(0);
   const perPage = 5;
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
   // Load available seasons from stat summary
   useEffect(() => {
     if (!athleteId) return;
+    setLoading(true);
+    setError(null);
     fetch(`/api/athletes/${athleteId}/stats/summary`)
-      .then((res) => res.json())
+      .then((res) => {
+        if (!res.ok) throw new Error('Failed to load');
+        return res.json();
+      })
       .then((data) => {
         const keys = Object.keys(data || {}).filter((s) => s !== 'career').sort();
         setSeasons(keys);
@@ -20,7 +27,11 @@ export default function GameLog({ athleteId }) {
           setSeason(keys[keys.length - 1]);
         }
       })
-      .catch((err) => console.error('Failed to load seasons', err));
+      .catch((err) => {
+        console.error('Failed to load seasons', err);
+        setError('Failed to load seasons');
+      })
+      .finally(() => setLoading(false));
   }, [athleteId]);
 
   // Load games when season or page changes
@@ -30,8 +41,13 @@ export default function GameLog({ athleteId }) {
     if (season) params.append('season', season);
     params.append('page', page);
     params.append('per_page', perPage);
+    setLoading(true);
+    setError(null);
     fetch(`/api/athletes/${athleteId}/game-log?${params.toString()}`)
-      .then((res) => res.json())
+      .then((res) => {
+        if (!res.ok) throw new Error('Failed to load');
+        return res.json();
+      })
       .then((data) => {
         if (Array.isArray(data)) {
           setGames(data);
@@ -41,10 +57,17 @@ export default function GameLog({ athleteId }) {
           setTotal(data.total || 0);
         }
       })
-      .catch((err) => console.error('Failed to load game log', err));
+      .catch((err) => {
+        console.error('Failed to load game log', err);
+        setError('Failed to load game log');
+      })
+      .finally(() => setLoading(false));
   }, [athleteId, season, page]);
 
   const lastPage = Math.max(1, Math.ceil(total / perPage));
+
+  if (loading) return <div>Loading...</div>;
+  if (error) return <div style={{ color: 'red' }}>{error}</div>;
 
   return (
     <div className="game-log">
