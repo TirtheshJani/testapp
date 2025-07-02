@@ -12,9 +12,18 @@
         <div class="container">
             <a class="navbar-brand" href="{{ url_for('main.index') }}">Sports Talent Agency</a>
             
-            <div class="navbar-nav ms-auto">
+            <div class="navbar-nav ms-auto d-flex align-items-center">
                 {% if current_user.is_authenticated %}
-                    <span class="navbar-text me-3">Welcome, {{ user_name or current_user.full_name }}!</span>
+                    <div class="d-flex align-items-center me-3">
+                        <div class="user-avatar">
+                            {% if current_user.avatar_url %}
+                                <img src="{{ current_user.avatar_url }}" alt="User avatar">
+                            {% else %}
+                                {{ current_user.initials }}
+                            {% endif %}
+                        </div>
+                        <span class="navbar-text ms-2">Welcome, {{ user_name or current_user.full_name }}!</span>
+                    </div>
                     <a class="nav-link" href="{{ url_for('main.dashboard') }}">Dashboard</a>
                     <a class="nav-link" href="{{ url_for('auth.logout') }}">Logout</a>
                 {% else %}
