@@ -61,6 +61,12 @@ body {
     border-radius: 50%;
 }
 
+/* Homepage search section */
+.search-section {
+    max-width: 600px;
+    margin: 0 auto 2rem;
+}
+
 /* Glassy navbar style */
 .navbar-glass {
     backdrop-filter: blur(6px);

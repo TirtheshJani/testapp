@@ -11,6 +11,14 @@
     {% endif %}
 </div>
 
+<div class="search-section text-center my-4">
+    <form id="homepage-search" class="d-flex justify-content-center">
+        <input type="text" id="search-query" class="form-control form-control-lg me-2" placeholder="Search athletes...">
+        <button type="submit" id="search-submit" class="btn btn-secondary btn-lg">Search</button>
+    </form>
+    <ul id="search-results" class="list-group w-50 mx-auto mt-3"></ul>
+</div>
+
 <div class="row">
     <div class="col-md-4">
         <div class="card h-100">
@@ -39,4 +47,8 @@
         </div>
     </div>
 </div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/search.js') }}"></script>
 {% endblock %}
