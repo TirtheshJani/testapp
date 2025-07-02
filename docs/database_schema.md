@@ -69,3 +69,9 @@ Key indexes exist to speed up stat retrieval:
   `(athlete_id, season)`.
 * `season_stats`: `athlete_id`, `season`, `team_id` and `(athlete_id, season)`.
 * `game_stats`: `game_id`, `athlete_id` and `(athlete_id, game_id)`.
+
+Unique constraints prevent duplicate records:
+
+* `season_stats`: `(athlete_id, season, name)`
+* `game_stats`: `(athlete_id, game_id, name)`
+Scores in all game tables must be non-negative.

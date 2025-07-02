@@ -44,6 +44,12 @@ class SeasonStat(BaseModel):
     team = db.relationship('Team')
 
     __table_args__ = (
+        db.UniqueConstraint(
+            'athlete_id',
+            'season',
+            'name',
+            name='uq_season_stat_player_season_name',
+        ),
         db.Index('idx_season_stats_athlete', 'athlete_id'),
         db.Index('idx_season_stats_season', 'season'),
         db.Index('idx_season_stats_team', 'team_id'),
@@ -71,6 +77,12 @@ class GameStat(BaseModel):
     game = db.relationship('Game')
 
     __table_args__ = (
+        db.UniqueConstraint(
+            'athlete_id',
+            'game_id',
+            'name',
+            name='uq_game_stat_unique',
+        ),
         db.Index('idx_game_stats_game', 'game_id'),
         db.Index('idx_game_stats_athlete', 'athlete_id'),
         db.Index('idx_game_stats_athlete_game', 'athlete_id', 'game_id'),

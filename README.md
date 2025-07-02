@@ -27,6 +27,8 @@ flask db upgrade
 
 The latest migrations add indexes on stat tables for faster lookups. Run the
 above command whenever pulling new code to ensure these indexes exist.
+The July 15 migration also enforces unique season and game stats and
+checks that game scores are non-negative.
 
 3. **Run the server**
    ```bash
