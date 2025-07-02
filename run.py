@@ -278,5 +278,14 @@ def seed_demo():
     db.session.commit()
     click.echo('Demo athlete data created.')
 
+
+@app.cli.command('backfill-stats')
+@click.option('--seasons', default=3, type=int, help='Number of past seasons to backfill')
+@with_appcontext
+def backfill_stats_cmd(seasons: int):
+    """Backfill historical statistics for all athletes."""
+    from app import jobs
+    jobs.historical_backfill_stats(num_seasons=seasons)
+
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5000)
