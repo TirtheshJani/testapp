@@ -62,3 +62,10 @@ teams (team_id PK, sport_id FK -> sports.sport_id)
 `season_stats` stores aggregated values per athlete and season, while
 `game_stats` captures per-game lines.  Each record references the related
 sport and team so multi-season histories can be stored for different leagues.
+
+Key indexes exist to speed up stat retrieval:
+
+* `athlete_stats`: `athlete_id`, `season`, and the combination
+  `(athlete_id, season)`.
+* `season_stats`: `athlete_id`, `season`, `team_id` and `(athlete_id, season)`.
+* `game_stats`: `game_id`, `athlete_id` and `(athlete_id, game_id)`.

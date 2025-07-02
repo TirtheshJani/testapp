@@ -16,6 +16,8 @@ class AthleteStat(BaseModel):
 
     __table_args__ = (
         db.Index('idx_stats_athlete', 'athlete_id'),
+        db.Index('idx_stats_season', 'season'),
+        db.Index('idx_stats_athlete_season', 'athlete_id', 'season'),
     )
 
     def __repr__(self):
@@ -44,6 +46,8 @@ class SeasonStat(BaseModel):
     __table_args__ = (
         db.Index('idx_season_stats_athlete', 'athlete_id'),
         db.Index('idx_season_stats_season', 'season'),
+        db.Index('idx_season_stats_team', 'team_id'),
+        db.Index('idx_season_stats_athlete_season', 'athlete_id', 'season'),
     )
 
     def __repr__(self):
@@ -68,6 +72,8 @@ class GameStat(BaseModel):
 
     __table_args__ = (
         db.Index('idx_game_stats_game', 'game_id'),
+        db.Index('idx_game_stats_athlete', 'athlete_id'),
+        db.Index('idx_game_stats_athlete_game', 'athlete_id', 'game_id'),
     )
 
     def __repr__(self):
