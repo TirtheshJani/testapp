@@ -42,3 +42,23 @@ Additional tables for NFL integration:
 ```
 nfl_teams (team_id PK)
 ```
+
+## Extended multi-sport stats schema
+
+To support historical statistics across NBA, MLB, NHL and NFL the following
+generic tables are introduced:
+
+```
+teams (team_id PK, sport_id FK -> sports.sport_id)
+  |--< games (game_id PK, sport_id FK -> sports.sport_id,
+             home_team_id FK -> teams.team_id,
+             visitor_team_id FK -> teams.team_id)
+  |      `--< game_stats (game_stat_id PK, game_id FK -> games.game_id,
+                         athlete_id FK -> athlete_profiles.athlete_id)
+  `--< season_stats (season_stat_id PK, team_id FK -> teams.team_id,
+                     athlete_id FK -> athlete_profiles.athlete_id)
+```
+
+`season_stats` stores aggregated values per athlete and season, while
+`game_stats` captures per-game lines.  Each record references the related
+sport and team so multi-season histories can be stored for different leagues.
