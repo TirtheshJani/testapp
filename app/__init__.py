@@ -4,7 +4,6 @@ from flask_migrate import Migrate
 from flask_login import LoginManager
 from authlib.integrations.flask_client import OAuth
 from config import config
-from .scheduler import init_scheduler
 
 # Initialize extensions
 db = SQLAlchemy()
@@ -43,6 +42,7 @@ def create_app(config_name='development'):
     app.register_blueprint(api_bp)
 
     if app.config.get('ENABLE_SCHEDULER'):
+        from .scheduler import init_scheduler
         init_scheduler(app)
     
     # User loader
