@@ -142,3 +142,27 @@ body {
   background: #007bff;
   color: #fff;
 }
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  /* Allow horizontal scrolling for stat tables on small screens */
+  .stat-table {
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+
+  /* Allow tabs to wrap on small screens */
+  .tabs {
+    flex-wrap: wrap;
+  }
+
+  /* Ensure charts scale within mobile viewports */
+  .stat-chart {
+    max-width: 100%;
+  }
+  .stat-chart canvas {
+    width: 100% !important;
+    height: auto !important;
+  }
+}
