@@ -26,6 +26,11 @@ athlete_profiles
 
 Each `AthleteProfile` record is associated with exactly one `User`. Media, stats and skills reference the athlete profile via foreign keys. Sports have many positions, and each athlete is linked to a sport and position.
 
+Key fields on `athlete_profiles` include:
+
+* `contract_active` – indicates if the athlete currently has an active team contract.
+* `created_at` – timestamp when the profile was first created.
+
 Additional tables for NBA integration:
 
 ```
