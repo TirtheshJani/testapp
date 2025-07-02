@@ -10,6 +10,7 @@ export default function AthleteProfile() {
   const { id } = useParams();
   const navigate = useNavigate();
   const [athlete, setAthlete] = useState(null);
+  const [statsTab, setStatsTab] = useState('summary');
 
   useEffect(() => {
     fetch(`/api/athletes/${id}`)
@@ -46,9 +47,33 @@ export default function AthleteProfile() {
       </div>
       <SkillEditor athleteId={id} />
       <StatEditor athleteId={id} />
-      <SeasonStats athleteId={id} />
-      <GameLog athleteId={id} />
-      <StatChart athleteId={id} />
+
+      <div className="stats-section">
+        <h3>Stats</h3>
+        <div className="tabs">
+          <button
+            className={`tab-button ${statsTab === 'summary' ? 'active' : ''}`}
+            onClick={() => setStatsTab('summary')}
+          >
+            Overview
+          </button>
+          <button
+            className={`tab-button ${statsTab === 'gameLog' ? 'active' : ''}`}
+            onClick={() => setStatsTab('gameLog')}
+          >
+            Game Log
+          </button>
+          <button
+            className={`tab-button ${statsTab === 'chart' ? 'active' : ''}`}
+            onClick={() => setStatsTab('chart')}
+          >
+            Charts
+          </button>
+        </div>
+        {statsTab === 'summary' && <SeasonStats athleteId={id} />}
+        {statsTab === 'gameLog' && <GameLog athleteId={id} />}
+        {statsTab === 'chart' && <StatChart athleteId={id} />}
+      </div>
     </div>
     </div>
   );
