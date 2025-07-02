@@ -8,7 +8,45 @@ document.addEventListener('DOMContentLoaded', () => {
   const button = document.getElementById('search-submit');
   const results = document.getElementById('search-results');
   const tabs = document.querySelectorAll('#filter-tabs .nav-link');
-  const featured = document.getElementById('featured-list');
+  const featured = document.getElementById('featured-grid');
+  let activeFilter = document.querySelector('#filter-tabs .nav-link.active')?.dataset.filter || '';
+
+  function createCard(ath) {
+    const col = document.createElement('div');
+    col.className = 'col';
+
+    const card = document.createElement('div');
+    card.className = 'card h-100';
+
+    const body = document.createElement('div');
+    body.className = 'card-body';
+
+    const title = document.createElement('h5');
+    title.className = 'card-title';
+    title.textContent = ath.user.full_name;
+
+    const team = document.createElement('p');
+    team.className = 'card-text';
+    team.textContent = ath.current_team || 'N/A';
+
+    const rating = document.createElement('p');
+    rating.className = 'card-text';
+    rating.innerHTML = `<small class="text-muted">Rating: ${ath.overall_rating ?? '-'}</small>`;
+
+    const link = document.createElement('a');
+    link.href = `/athletes/${ath.athlete_id}`;
+    link.className = 'btn btn-primary btn-sm';
+    link.textContent = 'View';
+
+    body.appendChild(title);
+    body.appendChild(team);
+    body.appendChild(rating);
+    body.appendChild(link);
+    card.appendChild(body);
+    col.appendChild(card);
+
+    return col;
+  }
 
   async function runSearch(params) {
     const res = await fetch(`/api/athletes/search?${params.toString()}`);
@@ -16,11 +54,13 @@ document.addEventListener('DOMContentLoaded', () => {
     return data.results || [];
   }
 
-  async function renderFeatured(filter) {
+  async function updateFeatured() {
     if (!featured) return;
     const params = new URLSearchParams();
-    if (filter) {
-      const f = filter.toLowerCase();
+    const query = input.value.trim();
+    if (query) params.append('q', query);
+    if (activeFilter) {
+      const f = activeFilter.toLowerCase();
       if (['nba', 'nfl', 'mlb', 'nhl'].includes(f)) {
         params.append('sport', f.toUpperCase());
       } else {
@@ -29,34 +69,27 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     const athletes = await runSearch(params);
     featured.innerHTML = '';
+    if (athletes.length === 0) {
+      const empty = document.createElement('div');
+      empty.className = 'col-12 text-center';
+      empty.textContent = 'No matching athletes found';
+      featured.appendChild(empty);
+      return;
+    }
     athletes.forEach((ath) => {
-      const li = document.createElement('li');
-      li.className = 'list-group-item';
-      li.textContent = ath.user.full_name;
-      featured.appendChild(li);
+      featured.appendChild(createCard(ath));
     });
   }
 
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
-    const query = input.value.trim();
-    if (!query) return;
 
     const original = button.textContent;
     button.textContent = 'Searching…';
     button.disabled = true;
 
     try {
-      const params = new URLSearchParams();
-      params.append('q', query);
-      const athletes = await runSearch(params);
-      results.innerHTML = '';
-      athletes.forEach((ath) => {
-        const li = document.createElement('li');
-        li.className = 'list-group-item';
-        li.textContent = ath.user.full_name;
-        results.appendChild(li);
-      });
+      await updateFeatured();
     } catch (err) {
       console.error('Search failed', err);
     } finally {
@@ -70,12 +103,14 @@ document.addEventListener('DOMContentLoaded', () => {
       e.preventDefault();
       tabs.forEach((t) => t.classList.remove('active'));
       tab.classList.add('active');
-      renderFeatured(tab.dataset.filter);
+      activeFilter = tab.dataset.filter;
+      updateFeatured();
     });
   });
 
   const activeTab = document.querySelector('#filter-tabs .nav-link.active');
   if (activeTab) {
-    renderFeatured(activeTab.dataset.filter);
+    activeFilter = activeTab.dataset.filter;
+    updateFeatured();
   }
 });
