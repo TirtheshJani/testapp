@@ -126,7 +126,8 @@ def get_user_info_from_provider(provider, token):
                 'first_name': user_data.get('given_name', ''),
                 'last_name': user_data.get('family_name', ''),
                 'provider_user_id': str(user_data.get('id')),
-                'email_verified': user_data.get('verified_email', False)
+                'email_verified': user_data.get('verified_email', False),
+                'picture': user_data.get('picture')
             }
         
         elif provider == 'github':
@@ -151,7 +152,8 @@ def get_user_info_from_provider(provider, token):
                 'first_name': first_name,
                 'last_name': last_name,
                 'provider_user_id': str(user_data.get('id')),
-                'email_verified': email_verified
+                'email_verified': email_verified,
+                'avatar_url': user_data.get('avatar_url')
             }
         
         elif provider == 'azure':
