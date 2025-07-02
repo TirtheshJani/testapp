@@ -61,10 +61,32 @@ document.addEventListener('DOMContentLoaded', () => {
     return col;
   }
 
+  function debounce(fn, delay) {
+    let timer;
+    return (...args) => {
+      clearTimeout(timer);
+      timer = setTimeout(() => fn(...args), delay);
+    };
+  }
+
   async function runSearch(params) {
-    const res = await fetch(`/api/athletes/search?${params.toString()}`);
-    const data = await res.json();
-    return data.results || [];
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 10000);
+    try {
+      const res = await fetch(`/api/athletes/search?${params.toString()}`, {
+        signal: controller.signal,
+      });
+      if (res.status === 429) {
+        throw new Error('Rate limit exceeded');
+      }
+      if (!res.ok) {
+        throw new Error('Request failed');
+      }
+      const data = await res.json();
+      return data.results || [];
+    } finally {
+      clearTimeout(timeoutId);
+    }
   }
 
   async function updateFeatured() {
@@ -80,18 +102,32 @@ document.addEventListener('DOMContentLoaded', () => {
         params.append('filter', f);
       }
     }
-    const athletes = await runSearch(params);
     featured.innerHTML = '';
-    if (athletes.length === 0) {
-      const empty = document.createElement('div');
-      empty.className = 'col-12 text-center';
-      empty.textContent = 'No matching athletes found';
-      featured.appendChild(empty);
-      return;
+    try {
+      const athletes = await runSearch(params);
+      if (athletes.length === 0) {
+        const empty = document.createElement('div');
+        empty.className = 'col-12 text-center';
+        empty.textContent = 'No matching athletes found';
+        featured.appendChild(empty);
+        return;
+      }
+      athletes.forEach((ath) => {
+        featured.appendChild(createCard(ath));
+      });
+    } catch (err) {
+      const msg = document.createElement('div');
+      msg.className = 'col-12 text-center text-danger';
+      if (err.message.includes('Rate limit')) {
+        msg.textContent = 'Too many requests. Please slow down and try again.';
+      } else if (err.name === 'AbortError') {
+        msg.textContent = 'Request timed out. Please try again.';
+      } else {
+        msg.textContent = 'Error fetching athletes. Please try again.';
+      }
+      featured.appendChild(msg);
+      throw err;
     }
-    athletes.forEach((ath) => {
-      featured.appendChild(createCard(ath));
-    });
   }
 
   form.addEventListener('submit', async (e) => {
@@ -106,11 +142,14 @@ document.addEventListener('DOMContentLoaded', () => {
       updateURL();
     } catch (err) {
       console.error('Search failed', err);
+      alert('Search failed. Please try again.');
     } finally {
       button.textContent = original;
       button.disabled = false;
     }
   });
+
+  const debouncedUpdateFeatured = debounce(updateFeatured, 300);
 
   tabs.forEach((tab) => {
     tab.addEventListener('click', (e) => {
@@ -118,7 +157,7 @@ document.addEventListener('DOMContentLoaded', () => {
       tabs.forEach((t) => t.classList.remove('active'));
       tab.classList.add('active');
       activeFilter = tab.dataset.filter;
-      updateFeatured();
+      debouncedUpdateFeatured();
       updateURL();
     });
   });
