@@ -1,5 +1,8 @@
 from flask import render_template, request
 from flask_login import current_user
+from sqlalchemy import func
+from app import db
+from app.models import AthleteProfile
 from app.utils.auth import oauth_session_required
 from app.main import bp
 
@@ -21,4 +24,13 @@ def index():
 def dashboard():
     """User dashboard"""
     user_name = current_user.full_name
-    return render_template('main/dashboard.html', user_name=user_name)
+    total_athletes = (
+        db.session.query(func.count(AthleteProfile.athlete_id))
+        .filter(AthleteProfile.is_deleted.is_(False))
+        .scalar()
+    )
+    return render_template(
+        'main/dashboard.html',
+        user_name=user_name,
+        total_athletes=total_athletes,
+    )
