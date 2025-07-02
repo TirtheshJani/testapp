@@ -74,3 +74,17 @@ def test_filter_top_limit(client, app_instance):
     assert resp.status_code == 200
     assert data['count'] == 10
 
+
+def test_filter_and_search_combined(client, app_instance):
+    """Filter tab should work together with text search."""
+    with app_instance.app_context():
+        a_nba = create_athlete('NBA')
+        create_athlete('NFL')
+
+    resp = client.get('/api/athletes/search?filter=nba&q=F')
+    data = json.loads(resp.data)
+
+    assert resp.status_code == 200
+    assert data['count'] == 1
+    assert data['results'][0]['athlete_id'] == a_nba.athlete_id
+
