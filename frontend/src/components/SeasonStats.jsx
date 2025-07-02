@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { computeSeasonData } from '../utils/stats.js';
 
 export default function SeasonStats({ athleteId }) {
   const [summary, setSummary] = useState(null);
@@ -28,25 +29,7 @@ export default function SeasonStats({ athleteId }) {
   if (error) return <div style={{ color: 'red' }}>{error}</div>;
   if (!summary) return null;
 
-  const seasons = Object.keys(summary).sort();
-  const statNames = new Set();
-  seasons.forEach((season) => {
-    const stats = summary[season] || {};
-    Object.keys(stats).forEach((name) => statNames.add(name));
-  });
-  const columns = Array.from(statNames);
-
-  const highs = {};
-  columns.forEach((name) => {
-    let max = -Infinity;
-    seasons.forEach((season) => {
-      const value = parseFloat(summary[season][name]);
-      if (!isNaN(value) && value > max) {
-        max = value;
-      }
-    });
-    highs[name] = max;
-  });
+  const { seasons, columns, highs } = computeSeasonData(summary);
 
   return (
     <div className="season-stats">
