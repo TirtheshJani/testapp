@@ -32,6 +32,8 @@ def _cached_search(key):
     max_height = int(params['max_height']) if 'max_height' in params else None
     min_weight = float(params['min_weight']) if 'min_weight' in params else None
     max_weight = float(params['max_weight']) if 'max_weight' in params else None
+    filter_tab = params.get('filter')
+    limit = 50
 
     query = (
         AthleteProfile.query.filter_by(is_deleted=False)
@@ -39,6 +41,16 @@ def _cached_search(key):
         .outerjoin(Sport)
         .outerjoin(Position)
     )
+
+    if filter_tab:
+        tab = filter_tab.lower()
+        if tab in {'nba', 'nfl', 'mlb', 'nhl'}:
+            query = query.filter(Sport.code == tab.upper())
+        elif tab == 'available':
+            if hasattr(AthleteProfile, 'contract_active'):
+                query = query.filter(AthleteProfile.contract_active.is_(False))
+        elif tab == 'top':
+            limit = 10
 
     if sport:
         if sport.isdigit():
@@ -91,7 +103,7 @@ def _cached_search(key):
 
     results = (
         query.order_by(AthleteProfile.overall_rating.desc())
-        .limit(50)
+        .limit(limit)
         .all()
     )
 
@@ -113,6 +125,7 @@ class AthleteSearch(Resource):
         'max_height': 'Maximum height (cm)',
         'min_weight': 'Minimum weight (kg)',
         'max_weight': 'Maximum weight (kg)',
+        'filter': 'Filter tab selection (nba, nfl, mlb, nhl, available, top)',
     }, description="Search athletes with optional filters")
     @validate_params([])
     def get(self):

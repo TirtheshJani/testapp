@@ -33,6 +33,7 @@ class AthleteProfile(BaseModel):
     years_professional = db.Column(db.Integer)
     current_team = db.Column(db.String(100))
     jersey_number = db.Column(db.String(5))
+    contract_active = db.Column(db.Boolean, default=True)
     
     # Profile information
     bio = db.Column(db.Text)
