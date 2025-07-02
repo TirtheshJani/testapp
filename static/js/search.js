@@ -9,7 +9,20 @@ document.addEventListener('DOMContentLoaded', () => {
   const results = document.getElementById('search-results');
   const tabs = document.querySelectorAll('#filter-tabs .nav-link');
   const featured = document.getElementById('featured-grid');
-  let activeFilter = document.querySelector('#filter-tabs .nav-link.active')?.dataset.filter || '';
+  const urlParams = new URLSearchParams(window.location.search);
+  let activeFilter = urlParams.get('filter') || document.querySelector('#filter-tabs .nav-link.active')?.dataset.filter || '';
+  if (urlParams.get('q')) {
+    input.value = urlParams.get('q');
+  }
+
+  function updateURL() {
+    const params = new URLSearchParams();
+    const q = input.value.trim();
+    if (q) params.set('q', q);
+    if (activeFilter) params.set('filter', activeFilter);
+    const newUrl = `${window.location.pathname}?${params.toString()}`;
+    window.history.replaceState({}, '', newUrl);
+  }
 
   function createCard(ath) {
     const col = document.createElement('div');
@@ -90,6 +103,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     try {
       await updateFeatured();
+      updateURL();
     } catch (err) {
       console.error('Search failed', err);
     } finally {
@@ -105,12 +119,20 @@ document.addEventListener('DOMContentLoaded', () => {
       tab.classList.add('active');
       activeFilter = tab.dataset.filter;
       updateFeatured();
+      updateURL();
     });
   });
 
-  const activeTab = document.querySelector('#filter-tabs .nav-link.active');
-  if (activeTab) {
-    activeFilter = activeTab.dataset.filter;
+  if (activeFilter) {
+    tabs.forEach((t) => {
+      if (t.dataset.filter === activeFilter) {
+        tabs.forEach((el) => el.classList.remove('active'));
+        t.classList.add('active');
+      }
+    });
+  }
+
+  if (urlParams.get('q') || activeFilter) {
     updateFeatured();
   }
 });
