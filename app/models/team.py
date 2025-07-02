@@ -1,6 +1,32 @@
 from app import db
 from app.models.base import BaseModel
 
+
+class Team(BaseModel):
+    """Generic team table supporting multiple sports."""
+
+    __tablename__ = 'teams'
+
+    team_id = db.Column(db.Integer, primary_key=True)
+    sport_id = db.Column(
+        db.Integer, db.ForeignKey('sports.sport_id'), nullable=False
+    )
+    abbreviation = db.Column(db.String(10))
+    city = db.Column(db.String(100))
+    name = db.Column(db.String(100), nullable=False)
+    league = db.Column(db.String(50))
+
+    sport = db.relationship('Sport')
+    games_home = db.relationship(
+        'Game', back_populates='home_team', foreign_keys='Game.home_team_id'
+    )
+    games_away = db.relationship(
+        'Game', back_populates='visitor_team', foreign_keys='Game.visitor_team_id'
+    )
+
+    def __repr__(self):
+        return f'<Team {self.name}>'
+
 class NBATeam(BaseModel):
     __tablename__ = 'nba_teams'
 
