@@ -25,6 +25,9 @@ Run database migrations to create all tables:
 flask db upgrade
 ```
 
+The latest migrations add indexes on stat tables for faster lookups. Run the
+above command whenever pulling new code to ensure these indexes exist.
+
 3. **Run the server**
    ```bash
    flask run
