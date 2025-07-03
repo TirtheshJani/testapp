@@ -102,3 +102,4 @@ a formula or survey data to calculate it dynamically.
 An **📊 View Analytics** button now links to `/analytics`. This page simply states "Coming soon" until full reporting features arrive in Phase 5.
 A **📁 Upload Media** button in the dashboard directs to `/media/upload` where administrators can attach files to athlete profiles.
 The API exposes a `/api/rankings/top` endpoint returning five placeholder athletes with an overall score. These values remain static until a real ranking system is implemented.
+The rankings page also includes a **⚙️ Customize Metrics** button. Clicking it opens a modal explaining that ranking weight adjustments are coming in a future phase.
