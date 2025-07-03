@@ -7,7 +7,7 @@ from sqlalchemy import or_
 from flask_restx import Resource
 from app.api import api
 from app import db
-from app.models import AthleteProfile, User, Sport, Position
+from app.models import AthleteProfile, User, Sport, Position, AthleteStat
 
 # Simple in-memory cache for search results
 _SEARCH_CACHE_SIZE = 128
@@ -139,6 +139,52 @@ class AthleteSearch(Resource):
         return jsonify({'results': results, 'count': len(results)})
 
 
+def _format_stat_value(value):
+    """Return a formatted string for numeric stats."""
+    try:
+        num = float(value)
+    except (TypeError, ValueError):
+        return str(value)
+    if 0 < num < 1:
+        return f"{num:.3f}".lstrip("0")
+    return f"{num:.1f}" if num % 1 else str(int(num))
+
+
+def _collect_featured_stats(athlete, year):
+    """Gather three key stats for display based on the athlete's sport."""
+    sport = athlete.primary_sport.code if athlete.primary_sport else None
+    mapping = {}
+    if sport == "NBA":
+        mapping = {
+            "PPG": "PointsPerGame",
+            "RPG": "ReboundsPerGame",
+            "APG": "AssistsPerGame",
+        }
+    elif sport == "NFL":
+        mapping = {
+            "PassingYards": "PassingYards",
+            "Touchdowns": "Touchdowns",
+            "QBRating": "QBRating",
+        }
+    elif sport == "MLB":
+        mapping = {
+            "AVG": "BattingAverage",
+            "HR": "HomeRuns",
+            "RBI": "RunsBattedIn",
+        }
+    elif sport == "NHL":
+        mapping = {"Goals": "Goals", "Assists": "Assists", "Points": "Points"}
+
+    stats = []
+    for label, name in mapping.items():
+        stat = AthleteStat.query.filter_by(
+            athlete_id=athlete.athlete_id, name=name, season=str(year)
+        ).first()
+        value = stat.value if stat else "N/A"
+        stats.append({"label": label, "value": _format_stat_value(value)})
+    return stats
+
+
 @api.route('/athletes/featured')
 class FeaturedAthletes(Resource):
     """Return manually curated featured athletes."""
@@ -149,8 +195,22 @@ class FeaturedAthletes(Resource):
         athletes = (
             AthleteProfile.query.filter_by(is_deleted=False, is_featured=True)
             .join(User)
+            .outerjoin(Sport)
+            .outerjoin(Position)
             .order_by(AthleteProfile.overall_rating.desc())
             .limit(limit)
             .all()
         )
-        return jsonify([ath.to_dict() for ath in athletes])
+        year = date.today().year
+        featured = []
+        for ath in athletes:
+            featured.append(
+                {
+                    "name": ath.user.full_name if ath.user else ath.athlete_id,
+                    "position": ath.primary_position.code if ath.primary_position else None,
+                    "team": ath.current_team or "N/A",
+                    "sport": ath.primary_sport.code if ath.primary_sport else None,
+                    "stats": _collect_featured_stats(ath, year),
+                }
+            )
+        return jsonify(featured)
