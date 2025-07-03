@@ -1,6 +1,7 @@
 from flask import render_template, request
 from flask_login import current_user
 from sqlalchemy import func
+from datetime import datetime, timedelta
 from app import db
 from app.models import AthleteProfile
 from app.utils.auth import oauth_session_required
@@ -37,9 +38,18 @@ def dashboard():
         )
         .scalar()
     )
+    new_this_week = (
+        db.session.query(func.count(AthleteProfile.athlete_id))
+        .filter(
+            AthleteProfile.is_deleted.is_(False),
+            AthleteProfile.created_at >= datetime.utcnow() - timedelta(days=7),
+        )
+        .scalar()
+    )
     return render_template(
         'main/dashboard.html',
         user_name=user_name,
         total_athletes=total_athletes,
         active_contracts=active_contracts,
+        new_this_week=new_this_week,
     )
