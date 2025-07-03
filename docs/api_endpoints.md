@@ -34,3 +34,9 @@ All API routes are prefixed with `/api`. Authentication is required for endpoint
 | Method | Endpoint | Description |
 | ------ | -------- | ----------- |
 | GET | `/api/athletes/search` | Search athletes using query parameters such as `q`, `sport`, `position`, `team`, age/height/weight filters and the `filter` tab (nba, nfl, mlb, nhl, available, top). |
+
+## Rankings
+
+| Method | Endpoint | Description |
+| ------ | -------- | ----------- |
+| GET | `/api/rankings/top` | Return a placeholder list of the top five athletes with an overall score. |
