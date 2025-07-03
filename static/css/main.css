@@ -61,6 +61,30 @@ body {
     border-radius: 50%;
 }
 
+/* Athlete photo/initials styles */
+.athlete-photo {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+    color: #fff;
+    font-weight: bold;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-transform: uppercase;
+    overflow: hidden;
+    flex-shrink: 0;
+}
+
+img.athlete-photo {
+    background: none;
+    width: 50px;
+    height: 50px;
+    object-fit: cover;
+    border-radius: 50%;
+}
+
 /* Homepage search section */
 .search-section {
     max-width: 600px;
