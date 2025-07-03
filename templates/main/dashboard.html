@@ -103,9 +103,26 @@
         {% endfor %}
     </div>
 </div>
+
+<div class="rankings mt-5">
+    <h3>Top Ranked Athletes</h3>
+    <input type="text" id="ranking-search" class="form-control mb-3" placeholder="Filter athletes...">
+    <ul id="ranking-list" class="list-group">
+        {% for athlete in rankings %}
+        <li class="list-group-item d-flex justify-content-between align-items-center ranking-item" data-name="{{ athlete.name }}">
+            <span>{{ loop.index }}. {{ athlete.name }} - {{ athlete.team }} ({{ athlete.sport }})</span>
+            <span class="badge bg-secondary">{{ athlete.rating }}</span>
+        </li>
+        {% endfor %}
+    </ul>
+</div>
 {% else %}
 <div class="alert alert-info">
     Please <a href="{{ url_for('auth.login') }}">login</a> to access your dashboard.
 </div>
 {% endif %}
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
 {% endblock %}

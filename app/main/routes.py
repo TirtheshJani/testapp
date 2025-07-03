@@ -131,6 +131,26 @@ def dashboard():
     if satisfaction_value <= 1.0:
         satisfaction_value *= 100
     client_satisfaction = f"{satisfaction_value:.1f}"
+
+    rankings_query = (
+        AthleteProfile.query.filter_by(is_deleted=False)
+        .join(User)
+        .outerjoin(Sport)
+        .order_by(AthleteProfile.overall_rating.desc())
+        .limit(10)
+    )
+    rankings = []
+    for ath in rankings_query:
+        name = ath.user.full_name if ath.user else ath.athlete_id
+        rankings.append(
+            {
+                "name": name,
+                "team": ath.current_team or "N/A",
+                "sport": ath.primary_sport.code if ath.primary_sport else None,
+                "rating": float(ath.overall_rating or 0),
+            }
+        )
+
     return render_template(
         'main/dashboard.html',
         user_name=user_name,
@@ -139,6 +159,7 @@ def dashboard():
         new_this_week=new_this_week,
         client_satisfaction=client_satisfaction,
         featured_athletes=featured_athletes,
+        rankings=rankings,
     )
 
 
