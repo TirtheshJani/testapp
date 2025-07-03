@@ -71,7 +71,14 @@
         <div class="col">
             <div class="athlete-card card h-100">
                 <div class="card-body">
-                    <h5 class="athlete-name card-title">{{ athlete.name }}</h5>
+                    <div class="d-flex align-items-center mb-2">
+                        {% if athlete.profile_image_url %}
+                        <img src="{{ athlete.profile_image_url }}" alt="{{ athlete.name }} photo" class="athlete-photo me-2">
+                        {% else %}
+                        <div class="athlete-photo me-2">{{ athlete.initials }}</div>
+                        {% endif %}
+                        <h5 class="athlete-name card-title mb-0">{{ athlete.name }}</h5>
+                    </div>
                     <p class="athlete-details text-muted">{{ athlete.position }} • {{ athlete.team }} • {{ athlete.sport }}</p>
                     <div class="d-flex justify-content-between">
                         {% for stat in athlete.stats %}

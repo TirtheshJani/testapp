@@ -34,9 +34,33 @@ document.addEventListener('DOMContentLoaded', () => {
     const body = document.createElement('div');
     body.className = 'card-body';
 
+    const header = document.createElement('div');
+    header.className = 'd-flex align-items-center mb-2';
+
+    let photoEl;
+    if (ath.profile_image_url) {
+      photoEl = document.createElement('img');
+      photoEl.className = 'athlete-photo me-2';
+      photoEl.src = ath.profile_image_url;
+      photoEl.alt = `${ath.user.full_name} photo`;
+    } else {
+      photoEl = document.createElement('div');
+      photoEl.className = 'athlete-photo me-2';
+      const initials = ath.user.full_name
+        .split(/\s+/)
+        .slice(0, 2)
+        .map((n) => n[0])
+        .join('')
+        .toUpperCase();
+      photoEl.textContent = initials;
+    }
+
     const title = document.createElement('h5');
-    title.className = 'card-title';
+    title.className = 'card-title mb-0';
     title.textContent = ath.user.full_name;
+
+    header.appendChild(photoEl);
+    header.appendChild(title);
 
     const team = document.createElement('p');
     team.className = 'card-text';
@@ -51,7 +75,7 @@ document.addEventListener('DOMContentLoaded', () => {
     link.className = 'btn btn-primary btn-sm';
     link.textContent = 'View';
 
-    body.appendChild(title);
+    body.appendChild(header);
     body.appendChild(team);
     body.appendChild(rating);
     body.appendChild(link);

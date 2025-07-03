@@ -108,12 +108,16 @@ def dashboard():
     )
     featured_athletes = []
     for ath in featured_profiles:
+        name = ath.user.full_name if ath.user else ath.athlete_id
+        initials = "".join([n[0] for n in name.split()][:2]).upper()
         featured_athletes.append(
             {
-                "name": ath.user.full_name if ath.user else ath.athlete_id,
+                "name": name,
                 "position": ath.primary_position.code if ath.primary_position else None,
                 "team": ath.current_team or "N/A",
                 "sport": ath.primary_sport.code if ath.primary_sport else None,
+                "profile_image_url": ath.profile_image_url,
+                "initials": initials,
                 "stats": _collect_featured_stats(ath, year),
             }
         )
