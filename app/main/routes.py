@@ -29,8 +29,17 @@ def dashboard():
         .filter(AthleteProfile.is_deleted.is_(False))
         .scalar()
     )
+    active_contracts = (
+        db.session.query(func.count(AthleteProfile.athlete_id))
+        .filter(
+            AthleteProfile.is_deleted.is_(False),
+            AthleteProfile.contract_active.is_(True),
+        )
+        .scalar()
+    )
     return render_template(
         'main/dashboard.html',
         user_name=user_name,
         total_athletes=total_athletes,
+        active_contracts=active_contracts,
     )
