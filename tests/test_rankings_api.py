@@ -77,5 +77,6 @@ def test_top_rankings_dynamic(client, app_instance):
     data = json.loads(resp.data)
     assert len(data) == 3
     assert data[0]["name"] == top_name
+    assert data[0]["id"]
     scores = [r["score"] for r in data]
     assert scores == sorted(scores, reverse=True)
