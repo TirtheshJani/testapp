@@ -1,9 +1,10 @@
-from flask import render_template, request, current_app
+from flask import render_template, request, current_app, redirect, url_for, flash
 from flask_login import current_user
 from sqlalchemy import func
 from datetime import datetime, timedelta, date
 from app import db
-from app.models import AthleteProfile, AthleteStat, User, Sport, Position
+from app.models import AthleteProfile, AthleteStat, AthleteMedia, User, Sport, Position
+from app.services.media_service import MediaService
 from app.utils.auth import oauth_session_required
 from app.main import bp
 
@@ -146,3 +147,34 @@ def dashboard():
 def analytics():
     """Analytics page placeholder."""
     return render_template('main/analytics.html')
+
+
+@bp.route('/media/upload', methods=['GET', 'POST'])
+@oauth_session_required
+def upload_media():
+    """Upload media for an athlete."""
+    athletes = (
+        AthleteProfile.query.filter_by(is_deleted=False)
+        .join(User)
+        .order_by(User.last_name)
+        .all()
+    )
+    if request.method == 'POST':
+        athlete_id = request.form.get('athlete_id')
+        file = request.files.get('file')
+        if not athlete_id or not file:
+            flash('Select an athlete and choose a file.', 'error')
+        else:
+            media_type = request.form.get('media_type', 'other')
+            path, _ = MediaService.save_file(file, athlete_id, media_type)
+            media = AthleteMedia(
+                athlete_id=athlete_id,
+                media_type=media_type,
+                file_path=path,
+                original_filename=file.filename,
+            )
+            db.session.add(media)
+            db.session.commit()
+            flash('Media uploaded successfully.', 'success')
+            return redirect(url_for('athletes.detail', athlete_id=athlete_id))
+    return render_template('main/upload_media.html', athletes=athletes)

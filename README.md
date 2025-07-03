@@ -100,3 +100,4 @@ placeholder value (set to 98.7%) for the demo. In Phase 3 the client may provid
 a formula or survey data to calculate it dynamically.
 
 An **📊 View Analytics** button now links to `/analytics`. This page simply states "Coming soon" until full reporting features arrive in Phase 5.
+A **📁 Upload Media** button in the dashboard directs to `/media/upload` where administrators can attach files to athlete profiles.
