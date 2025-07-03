@@ -14,6 +14,11 @@ _DEFAULT_RANKINGS = [
     {"name": "Mike Trout", "score": 96.2},
     {"name": "Aaron Donald", "score": 95.7},
     {"name": "Stephen Curry", "score": 94.9},
+    {"name": "Giannis Antetokounmpo", "score": 94.0},
+    {"name": "Patrick Mahomes", "score": 93.5},
+    {"name": "Sidney Crosby", "score": 92.8},
+    {"name": "Shohei Ohtani", "score": 92.2},
+    {"name": "Lionel Messi", "score": 91.7},
 ]
 
 

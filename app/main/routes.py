@@ -182,10 +182,12 @@ def upload_media():
 
 @bp.route('/rankings')
 def rankings():
-    """Display the top athlete rankings."""
+    """Display the full rankings placeholder page."""
+    # NOTE: This is a temporary page until the comprehensive
+    # ranking algorithm is implemented in Phase 4.
     from app.api.rankings import _dynamic_rankings, _load_rankings
 
-    rankings = _dynamic_rankings()
+    rankings = _dynamic_rankings(limit=10)
     if rankings is None:
         rankings = _load_rankings()
 
