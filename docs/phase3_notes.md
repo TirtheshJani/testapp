@@ -10,7 +10,12 @@ The dashboard now includes a **📊 View Analytics** button linking to `/analyti
 
 ## Top Rankings
 
-A `/api/rankings/top` endpoint returns five hard-coded athletes with an overall score. This serves as an interim data source until the multi-factor ranking system is developed in Phase 4.
+The `/api/rankings/top` endpoint now calculates a basic ranking from any
+athletes stored in the database. It uses a simple single-stat formula for each
+sport (for example NBA points per game) to assign a score out of 100. If no
+athlete data exists it will still return a small hard-coded list. This logic is
+explicitly temporary and will be replaced by a multi-metric algorithm in
+Phase 4.
 
 ## Media upload
 
