@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block title %}Top Rankings - {{ super() }}{% endblock %}
+
+{% block content %}
+<div class="rankings-list">
+  {% for player in top_rankings %}
+  <div class="ranking-item">
+    <div class="rank-number">{{ loop.index }}</div>
+    <div class="ranking-info">
+      <div class="ranking-name">{{ player.name }}</div>
+      <div class="ranking-score">Overall Score: {{ '%.1f'|format(player.score|float) }}</div>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+{% endblock %}
