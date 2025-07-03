@@ -29,6 +29,7 @@ def dashboard():
         db.session.query(func.count(AthleteProfile.athlete_id))
         .filter(AthleteProfile.is_deleted.is_(False))
         .scalar()
+        or 0
     )
     active_contracts = (
         db.session.query(func.count(AthleteProfile.athlete_id))
@@ -37,6 +38,7 @@ def dashboard():
             AthleteProfile.contract_active.is_(True),
         )
         .scalar()
+        or 0
     )
     new_this_week = (
         db.session.query(func.count(AthleteProfile.athlete_id))
@@ -45,8 +47,17 @@ def dashboard():
             AthleteProfile.created_at >= datetime.utcnow() - timedelta(days=7),
         )
         .scalar()
+        or 0
     )
-    client_satisfaction = current_app.config.get('CLIENT_SATISFACTION_PERCENT', 98.7)
+
+    raw_satisfaction = current_app.config.get('CLIENT_SATISFACTION_PERCENT', 98.7)
+    try:
+        satisfaction_value = float(raw_satisfaction)
+    except (TypeError, ValueError):
+        satisfaction_value = 0.0
+    if satisfaction_value <= 1.0:
+        satisfaction_value *= 100
+    client_satisfaction = f"{satisfaction_value:.1f}"
     return render_template(
         'main/dashboard.html',
         user_name=user_name,
