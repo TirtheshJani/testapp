@@ -63,6 +63,30 @@
         </div>
     </div>
 </div>
+
+<div class="featured-athletes mt-4">
+    <h3>Featured Athletes</h3>
+    <div class="row row-cols-1 row-cols-md-2 g-4">
+        {% for athlete in featured_athletes %}
+        <div class="col">
+            <div class="athlete-card card h-100">
+                <div class="card-body">
+                    <h5 class="athlete-name card-title">{{ athlete.name }}</h5>
+                    <p class="athlete-details text-muted">{{ athlete.position }} • {{ athlete.team }} • {{ athlete.sport }}</p>
+                    <div class="d-flex justify-content-between">
+                        {% for stat in athlete.stats %}
+                        <div class="stat text-center">
+                            <div class="h5 mb-0">{{ stat.value }}</div>
+                            <div class="stat-label-small text-muted">{{ stat.label }}</div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
 {% else %}
 <div class="alert alert-info">
     Please <a href="{{ url_for('auth.login') }}">login</a> to access your dashboard.
