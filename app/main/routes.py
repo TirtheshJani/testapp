@@ -178,3 +178,15 @@ def upload_media():
             flash('Media uploaded successfully.', 'success')
             return redirect(url_for('athletes.detail', athlete_id=athlete_id))
     return render_template('main/upload_media.html', athletes=athletes)
+
+
+@bp.route('/rankings')
+def rankings():
+    """Display the top athlete rankings."""
+    from app.api.rankings import _dynamic_rankings, _load_rankings
+
+    rankings = _dynamic_rankings()
+    if rankings is None:
+        rankings = _load_rankings()
+
+    return render_template('main/rankings.html', top_rankings=rankings)
