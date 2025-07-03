@@ -137,3 +137,20 @@ class AthleteSearch(Resource):
             current_app.logger.info('search query: %s', key)
 
         return jsonify({'results': results, 'count': len(results)})
+
+
+@api.route('/athletes/featured')
+class FeaturedAthletes(Resource):
+    """Return manually curated featured athletes."""
+
+    @validate_params([])
+    def get(self):
+        limit = request.args.get('limit', 6, type=int)
+        athletes = (
+            AthleteProfile.query.filter_by(is_deleted=False, is_featured=True)
+            .join(User)
+            .order_by(AthleteProfile.overall_rating.desc())
+            .limit(limit)
+            .all()
+        )
+        return jsonify([ath.to_dict() for ath in athletes])
