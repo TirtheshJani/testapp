@@ -139,3 +139,10 @@ def dashboard():
         client_satisfaction=client_satisfaction,
         featured_athletes=featured_athletes,
     )
+
+
+@bp.route('/analytics')
+@oauth_session_required
+def analytics():
+    """Analytics page placeholder."""
+    return render_template('main/analytics.html')

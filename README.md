@@ -98,3 +98,5 @@ Additional technical documentation is available in the `docs/` directory:
 The dashboard also shows a **Client Satisfaction** percentage. This metric is a
 placeholder value (set to 98.7%) for the demo. In Phase 3 the client may provide
 a formula or survey data to calculate it dynamically.
+
+An **📊 View Analytics** button now links to `/analytics`. This page simply states "Coming soon" until full reporting features arrive in Phase 5.
