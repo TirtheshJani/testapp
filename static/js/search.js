@@ -25,11 +25,9 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function createCard(ath) {
-    const col = document.createElement('div');
-    col.className = 'col';
-
-    const card = document.createElement('div');
-    card.className = 'card h-100';
+    const card = document.createElement('a');
+    card.className = 'athlete-card card h-100 text-decoration-none';
+    card.href = `/athletes/${ath.athlete_id}`;
 
     const body = document.createElement('div');
     body.className = 'card-body';
@@ -70,19 +68,12 @@ document.addEventListener('DOMContentLoaded', () => {
     rating.className = 'card-text';
     rating.innerHTML = `<small class="text-muted">Rating: ${ath.overall_rating ?? '-'}</small>`;
 
-    const link = document.createElement('a');
-    link.href = `/athletes/${ath.athlete_id}`;
-    link.className = 'btn btn-primary btn-sm';
-    link.textContent = 'View';
-
     body.appendChild(header);
     body.appendChild(team);
     body.appendChild(rating);
-    body.appendChild(link);
     card.appendChild(body);
-    col.appendChild(card);
 
-    return col;
+    return card;
   }
 
   function debounce(fn, delay) {
@@ -152,7 +143,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const athletes = useSearch ? await runSearch(params) : await runFeatured();
       if (athletes.length === 0) {
         const empty = document.createElement('div');
-        empty.className = 'col-12 text-center';
+        empty.className = 'text-center w-100';
         empty.textContent = 'No matching athletes found';
         featured.appendChild(empty);
         return;
@@ -162,7 +153,7 @@ document.addEventListener('DOMContentLoaded', () => {
       });
     } catch (err) {
       const msg = document.createElement('div');
-      msg.className = 'col-12 text-center text-danger';
+      msg.className = 'text-center text-danger w-100';
       if (err.message.includes('Rate limit')) {
         msg.textContent = 'Too many requests. Please slow down and try again.';
       } else if (err.name === 'AbortError') {

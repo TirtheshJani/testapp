@@ -130,3 +130,39 @@ img.athlete-photo {
         font-size: 1.5rem;
     }
 }
+
+/* Featured athletes grid and cards */
+.athlete-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1rem;
+}
+
+.athlete-card {
+    cursor: pointer;
+    color: inherit;
+    text-decoration: none;
+    transition: transform 0.1s;
+}
+
+.athlete-card:active {
+    transform: scale(0.98);
+}
+
+@media (max-width: 576px) {
+    .athlete-grid {
+        grid-template-columns: 1fr;
+    }
+    .quick-actions {
+        text-align: center;
+    }
+    .athlete-card .card-body {
+        padding: 0.75rem;
+    }
+    .athlete-card h5 {
+        font-size: 1rem;
+    }
+    .athlete-card .card-text {
+        font-size: 0.875rem;
+    }
+}
