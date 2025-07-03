@@ -41,6 +41,7 @@ class AthleteProfile(BaseModel):
     is_verified = db.Column(db.Boolean, default=False)
     verification_date = db.Column(db.DateTime)
     is_deleted = db.Column(db.Boolean, default=False)
+    is_featured = db.Column(db.Boolean, default=False)
     
     # Search and ranking
     search_vector = db.Column(db.Text)  # For full-text search

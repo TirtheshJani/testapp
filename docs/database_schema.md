@@ -30,6 +30,7 @@ Key fields on `athlete_profiles` include:
 
 * `contract_active` – indicates if the athlete currently has an active team contract.
 * `created_at` – timestamp when the profile was first created.
+* `is_featured` – when true the athlete appears in the Featured grid on the homepage.
 
 Additional tables for NBA integration:
 
