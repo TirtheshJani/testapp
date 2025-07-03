@@ -1,4 +1,4 @@
-from flask import render_template, request
+from flask import render_template, request, current_app
 from flask_login import current_user
 from sqlalchemy import func
 from datetime import datetime, timedelta
@@ -46,10 +46,12 @@ def dashboard():
         )
         .scalar()
     )
+    client_satisfaction = current_app.config.get('CLIENT_SATISFACTION_PERCENT', 98.7)
     return render_template(
         'main/dashboard.html',
         user_name=user_name,
         total_athletes=total_athletes,
         active_contracts=active_contracts,
         new_this_week=new_this_week,
+        client_satisfaction=client_satisfaction,
     )

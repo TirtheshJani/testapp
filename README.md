@@ -94,3 +94,7 @@ Additional technical documentation is available in the `docs/` directory:
 - `database_schema.md` – overview of the database tables and relationships
 - `api_endpoints.md` – list of API endpoints with parameters
 - `user_guide_athletes.md` – instructions for managing athlete profiles
+
+The dashboard also shows a **Client Satisfaction** percentage. This metric is a
+placeholder value (set to 98.7%) for the demo. In Phase 3 the client may provide
+a formula or survey data to calculate it dynamically.

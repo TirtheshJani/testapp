@@ -22,6 +22,7 @@ class Config:
     NBA_API_TOKEN = os.environ.get("NBA_API_TOKEN")
     NFL_API_BASE_URL = os.environ.get("NFL_API_BASE_URL") or "https://api.nfl.com/v1"
     NHL_API_BASE_URL = os.environ.get("NHL_API_BASE_URL") or "https://statsapi.web.nhl.com/api/v1"
+    CLIENT_SATISFACTION_PERCENT = float(os.environ.get('CLIENT_SATISFACTION_PERCENT', '98.7'))
     ENABLE_SCHEDULER = os.environ.get('ENABLE_SCHEDULER', 'false').lower() == 'true'
 
 class DevelopmentConfig(Config):
