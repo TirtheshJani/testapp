@@ -39,4 +39,4 @@ All API routes are prefixed with `/api`. Authentication is required for endpoint
 
 | Method | Endpoint | Description |
 | ------ | -------- | ----------- |
-| GET | `/api/rankings/top` | Return a placeholder list of the top five athletes with an overall score. |
+| GET | `/api/rankings/top` | Return the top five athletes using a temporary single-stat score (falls back to a small static list). |
