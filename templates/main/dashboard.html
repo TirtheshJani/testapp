@@ -82,7 +82,7 @@
     <h3>Featured Athletes</h3>
     <div class="athlete-grid">
         {% for athlete in featured_athletes %}
-        <a href="{{ url_for('athletes.view', id=athlete.athlete_id) }}" class="athlete-card card h-100 text-decoration-none">
+        <a href="{{ url_for('athletes.detail', athlete_id=athlete.athlete_id) }}" class="athlete-card card h-100 text-decoration-none">
             <div class="card-body">
                 <div class="d-flex align-items-center mb-2">
                     {% if athlete.profile_image_url %}

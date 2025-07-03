@@ -16,7 +16,13 @@
   <div class="ranking-item">
     <div class="rank-number">{{ loop.index }}</div>
     <div class="ranking-info">
-      <div class="ranking-name">{{ player.name }}</div>
+      <div class="ranking-name">
+        {% if player.id %}
+        <a href="{{ url_for('athletes.detail', athlete_id=player.id) }}" class="text-decoration-none">{{ player.name }}</a>
+        {% else %}
+        {{ player.name }}
+        {% endif %}
+      </div>
       <div class="ranking-score">Overall Score: {{ '%.1f'|format(player.score|float) }}</div>
     </div>
   </div>

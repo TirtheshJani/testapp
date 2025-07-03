@@ -39,6 +39,7 @@ _SPORT_STAT = {
     "NFL": "PassingYards",
     "MLB": "BattingAverage",
     "NHL": "Points",
+    "SOC": "Goals",
 }
 
 # Rough maximum values used to scale a stat to 0-100. These heuristics are only
@@ -48,6 +49,7 @@ _STAT_MAX = {
     "PassingYards": 5000,
     "BattingAverage": 0.35,
     "Points": 120,
+    "Goals": 60,
 }
 
 
@@ -98,7 +100,11 @@ def _dynamic_rankings(limit=5):
     ranked = []
     for ath in athletes:
         name = ath.user.full_name if ath.user else ath.athlete_id
-        ranked.append({"name": name, "score": _calculate_simple_score(ath)})
+        ranked.append({
+            "id": ath.athlete_id,
+            "name": name,
+            "score": _calculate_simple_score(ath),
+        })
 
     ranked.sort(key=lambda r: r["score"], reverse=True)
     return ranked[:limit]
