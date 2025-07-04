@@ -24,6 +24,7 @@ def login():
         ).first()
         if user and user.check_password(form.password.data):
             login_user(user)
+            session['auth_token'] = 'session'
             flash('Logged in successfully.', 'success')
             return redirect(url_for('main.dashboard'))
         flash('Invalid credentials', 'error')
@@ -58,6 +59,7 @@ def register():
             db.session.add(user)
             db.session.commit()
             login_user(user)
+            session['auth_token'] = 'session'
             flash('Registration successful.', 'success')
             return redirect(url_for('main.dashboard'))
 
