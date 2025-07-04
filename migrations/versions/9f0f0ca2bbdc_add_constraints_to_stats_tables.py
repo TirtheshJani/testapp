@@ -47,21 +47,25 @@ def upgrade():
         'nba_games',
         'visitor_team_score >= 0'
     )
-    op.create_check_constraint(
-        'ck_nhl_game_home_score_non_negative',
-        'nhl_games',
-        'home_team_score >= 0'
-    )
-    op.create_check_constraint(
-        'ck_nhl_game_visitor_score_non_negative',
-        'nhl_games',
-        'visitor_team_score >= 0'
-    )
+    bind = op.get_bind()
+    if sa.inspect(bind).has_table('nhl_games'):
+        op.create_check_constraint(
+            'ck_nhl_game_home_score_non_negative',
+            'nhl_games',
+            'home_team_score >= 0'
+        )
+        op.create_check_constraint(
+            'ck_nhl_game_visitor_score_non_negative',
+            'nhl_games',
+            'visitor_team_score >= 0'
+        )
 
 
 def downgrade():
-    op.drop_constraint('ck_nhl_game_visitor_score_non_negative', 'nhl_games', type_='check')
-    op.drop_constraint('ck_nhl_game_home_score_non_negative', 'nhl_games', type_='check')
+    bind = op.get_bind()
+    if sa.inspect(bind).has_table('nhl_games'):
+        op.drop_constraint('ck_nhl_game_visitor_score_non_negative', 'nhl_games', type_='check')
+        op.drop_constraint('ck_nhl_game_home_score_non_negative', 'nhl_games', type_='check')
     op.drop_constraint('ck_nba_game_visitor_score_non_negative', 'nba_games', type_='check')
     op.drop_constraint('ck_nba_game_home_score_non_negative', 'nba_games', type_='check')
     op.drop_constraint('ck_game_visitor_score_non_negative', 'games', type_='check')
