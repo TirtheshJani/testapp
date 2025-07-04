@@ -106,9 +106,34 @@
         {% endfor %}
     </div>
 </div>
+
+<div class="top-rankings mt-5">
+    <h3>Top Rankings</h3>
+    <div class="rankings-list">
+        {% for player in top_rankings %}
+        <div class="ranking-item">
+            <div class="rank-number">{{ loop.index }}</div>
+            <div class="ranking-info">
+                <div class="ranking-name">
+                    {% if player.id %}
+                    <a href="{{ url_for('athletes.detail', athlete_id=player.id) }}" class="text-decoration-none">{{ player.name }}</a>
+                    {% else %}
+                    {{ player.name }}
+                    {% endif %}
+                </div>
+                <div class="ranking-score">Overall Score: {{ '%.1f'|format(player.score|float) }}</div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
 {% else %}
 <div class="alert alert-info">
     Please <a href="{{ url_for('auth.login') }}">login</a> to access your dashboard.
 </div>
 {% endif %}
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/search.js') }}"></script>
 {% endblock %}

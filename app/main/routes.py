@@ -5,6 +5,7 @@ from datetime import datetime, timedelta, date
 from app import db
 from app.models import AthleteProfile, AthleteStat, AthleteMedia, User, Sport, Position
 from app.services.media_service import MediaService
+from app.api.rankings import _dynamic_rankings, _load_rankings
 from app.utils.auth import oauth_session_required
 from app.main import bp
 
@@ -131,6 +132,11 @@ def dashboard():
     if satisfaction_value <= 1.0:
         satisfaction_value *= 100
     client_satisfaction = f"{satisfaction_value:.1f}"
+
+    rankings = _dynamic_rankings(limit=5)
+    if rankings is None:
+        rankings = _load_rankings()[:5]
+
     return render_template(
         'main/dashboard.html',
         user_name=user_name,
@@ -139,6 +145,7 @@ def dashboard():
         new_this_week=new_this_week,
         client_satisfaction=client_satisfaction,
         featured_athletes=featured_athletes,
+        top_rankings=rankings,
     )
 
 
