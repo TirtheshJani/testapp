@@ -24,3 +24,10 @@ A new **📁 Upload Media** option on the dashboard links to `/media/upload`. Th
 ## Customize Metrics button
 
 The rankings page now displays a **⚙️ Customize Metrics** button. In Phase 3 this opens a modal dialog explaining the feature is coming soon. The modal shows read-only sliders for weighting factors to signal future support for ranking customization.
+
+## Out of scope
+
+Mobile applications and a cloud-hosted deployment are not included in Phases 1–3.
+The search bar on the homepage performs only basic filtering and the ranking
+algorithm is a simple placeholder. More advanced functionality will arrive in
+later phases.

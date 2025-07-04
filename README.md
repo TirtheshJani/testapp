@@ -79,6 +79,18 @@ This starts the Flask server on port `5000` and a Postgres database on `5432`.
 
 The React frontend is regularly tested on the latest versions of Chrome, Firefox, Safari and Edge. Other modern browsers that support ES2015+ features should also work.
 
+## Dashboard features (Phases 1–3)
+
+The `/dashboard` page implements the core capabilities delivered so far:
+
+- Quick action links for editing a profile, managing account settings and, for administrators, adding new athletes.
+- Buttons for **📁 Upload Media** and **📊 View Analytics** which lead to placeholder pages.
+- Summary metrics showing total athletes, active contracts, new signups this week and a placeholder **Client Satisfaction** percentage.
+- Featured athlete cards displaying position, team and sport information.
+- A Top Rankings preview calculated using a simple single-stat formula. A **⚙️ Customize Metrics** modal hints at future ranking options.
+
+Advanced search and a full ranking algorithm are deferred until Phase 4. Mobile apps and cloud deployment are out of scope; the project targets local web use only.
+
 ## Checking layout on mobile vs. desktop
 
 To verify the responsive design manually:
