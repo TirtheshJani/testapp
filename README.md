@@ -27,6 +27,7 @@ flask db upgrade
 
 The latest migrations add indexes on stat tables for faster lookups. Run the
 above command whenever pulling new code to ensure these indexes exist.
+The August 1 migration adds indexes on user first and last name and current team to speed up searches.
 The July 15 migration also enforces unique season and game stats and
 checks that game scores are non-negative.
 
