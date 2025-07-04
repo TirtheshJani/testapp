@@ -149,6 +149,41 @@ img.athlete-photo {
     transform: scale(0.98);
 }
 
+/* Rankings list styles */
+.rankings-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.ranking-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid #dee2e6;
+}
+
+.rank-number {
+    font-weight: bold;
+    margin-right: 0.5rem;
+}
+
+.ranking-info {
+    display: flex;
+    justify-content: space-between;
+    flex: 1;
+}
+
+.ranking-name {
+    font-weight: 500;
+}
+
+.ranking-score {
+    white-space: nowrap;
+    margin-left: 0.5rem;
+}
+
 @media (max-width: 576px) {
     .athlete-grid {
         grid-template-columns: 1fr;
@@ -164,5 +199,18 @@ img.athlete-photo {
     }
     .athlete-card .card-text {
         font-size: 0.875rem;
+    }
+}
+
+/* Mobile layout adjustments */
+@media (max-width: 600px) {
+    .quick-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        justify-content: center;
+    }
+    .main-content {
+        grid-template-columns: 1fr;
     }
 }
